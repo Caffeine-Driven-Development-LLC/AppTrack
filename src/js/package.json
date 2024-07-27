@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "test": "jest",
+    "coverage": "jest --coverage"
+  },
+  "type": "module"
+}

@@ -1,0 +1,5 @@
+export const requestGetSankeyNodes = 'request-get-sankey-nodes'
+export const responseSankeyNodes = 'response-sankey-nodes'
+export const requestAddSankeyNode = 'request-add-sankey-node'
+export const requestUpdateSankeyNode = 'request-update-sankey-node'
+export const requestDeleteSankeyNode = 'request-delete-sankey-node'

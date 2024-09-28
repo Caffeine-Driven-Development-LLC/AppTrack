@@ -59,6 +59,8 @@ but for the time being it has a basic set of states.
 ## Nice to haves
  - Add helper modals when first viewing a page
  - Tool tips on all the things
+ - Rework company page so there is an easier time switching companies when looking at company details
+ - Find a quicker way to open up all stared companies career pages
 
 ## Future releases
  - Resume Tracking

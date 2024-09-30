@@ -15,7 +15,6 @@ import {
     registerMediaActions,
     registerMediaProtocol,
 } from './protocol/media-protocol.js'
-import { initializeNamedPipe } from './sockets/named-pipe.js'
 
 if (isFirstRun) {
     app.quit()
@@ -71,7 +70,6 @@ app.whenReady()
         createWindow()
     })
     .then(initializeAutoUpdate)
-    .then(initializeNamedPipe)
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

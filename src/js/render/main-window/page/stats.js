@@ -38,7 +38,7 @@ export default function () {
                         handleChange({
                             target: {
                                 id: 'startDate',
-                                value: date?.format('YYY-MM-DD')
+                                value: date?.format('YYYY-MM-DD')
                             },
                         })
                     }
@@ -58,7 +58,7 @@ export default function () {
                         handleChange({
                             target: {
                                 id: 'endDate',
-                                value: date?.format('YYY-MM-DD')
+                                value: date?.format('YYYY-MM-DD')
                             },
                         })
                     }

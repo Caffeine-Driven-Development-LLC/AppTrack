@@ -96,7 +96,7 @@ export default function ({ data, height }) {
         chart?.destroy()
         setChart(null)
         setChart(drawChart())
-    }, [theme.palette.mode, isDarkTheme])
+    }, [theme.palette.mode, isDarkTheme, data])
 
     return (
         <canvas

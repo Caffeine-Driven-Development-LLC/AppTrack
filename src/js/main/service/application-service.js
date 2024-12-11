@@ -136,7 +136,7 @@ export async function searchApplications(searchText) {
  * Returns data to populate a sankey chart with data from all applications.
  * @returns {Promise<{nodes: [], links: []}>} a promise that resolves to an object with nodes and links
  */
-export async function getAllApplicationSankeyData() {
+export async function getAllApplicationSankeyData(startDate, endDate) {
     return selectApplications(false, null, true)
         .then((applications) => applications.map(populateGhostData))
         .then((applications) => Promise.all(applications.map(populateEvents)))

@@ -10,6 +10,12 @@ import {
     updateApplication,
     updateEvent,
 } from '../application-service'
+import { ghostPeriod as mockGhostPeriod } from '../setting-service.js'
+import {
+    selectApplications as mockSelectApplications,
+    selectEventsByApplicationId as mockSelectEventsByApplicationId,
+} from '../../persistence/application-persistence.js'
+import { getSankeyData as mockGetSankeyData } from '../sankey-service.js'
 
 jest.mock('../setting-service.js', () => ({
     ghostPeriod: jest.fn(),
@@ -39,14 +45,18 @@ jest.mock('../../persistence/application-persistence.js', () => ({
     updateApplication: jest.fn(),
 }))
 
-const date = new Date()
-date.setDate(date.getDate() - 10)
+function generateDateStringForDaysAgo (daysAgo) {
+    const date = new Date()
+    date.setDate(date.getDate() - daysAgo)
 
-const year = date.getFullYear()
-const month = (date.getMonth() + 1).toString().padStart(2, '0') // Months are 0-based in JavaScript
-const day = date.getDate().toString().padStart(2, '0')
+    const year = date.getFullYear()
+    const month = (date.getMonth() + 1).toString().padStart(2, '0') // Months are 0-based in JavaScript
+    const day = date.getDate().toString().padStart(2, '0')
 
-const dateString10DaysAgo = `${year}-${month}-${day}`
+    return `${year}-${month}-${day}`
+}
+
+const dateString10DaysAgo = generateDateStringForDaysAgo(10)
 
 describe('ApplicationServiceTests', function () {
     beforeEach(() => {
@@ -473,6 +483,7 @@ describe('ApplicationServiceTests', function () {
             expect(mockSelectApplications).toHaveBeenCalledWith(
                 false,
                 cutoffDateString,
+                null,
                 false
             )
         })
@@ -532,6 +543,7 @@ describe('ApplicationServiceTests', function () {
             expect(mockSelectApplications).toHaveBeenCalledWith(
                 false,
                 cutoffDateString,
+                null,
                 false
             )
             expect(mockSelectApplications).toHaveBeenCalledTimes(1)
@@ -594,6 +606,7 @@ describe('ApplicationServiceTests', function () {
             expect(mockSelectApplications).toHaveBeenCalledWith(
                 false,
                 cutoffDateString,
+                null,
                 false
             )
             expect(mockSelectApplications).toHaveBeenCalledTimes(1)
@@ -699,6 +712,89 @@ describe('ApplicationServiceTests', function () {
             expect(mockSelectApplications).toHaveBeenCalledWith(
                 false,
                 null,
+                null,
+                true
+            )
+
+            expect(mockSelectEventsByApplicationId).toHaveBeenCalledWith(1)
+            expect(mockSelectEventsByApplicationId).toHaveBeenCalledWith(2)
+            const expectedArgsToGetSankeyData = [
+                mockApplication1,
+                mockApplication2,
+            ].map((application) => ({
+                ...application,
+                events: mockEvents,
+                ghosted: false,
+                percentGhosted: 50,
+            }))
+            expect(mockGetSankeyData).toHaveBeenCalledWith(
+                expectedArgsToGetSankeyData
+            )
+
+            expect(mockSelectApplications).toHaveBeenCalledTimes(1)
+            expect(mockSelectEventsByApplicationId).toHaveBeenCalledTimes(2)
+            expect(mockGetSankeyData).toHaveBeenCalledTimes(1)
+        })
+
+        it('should return sankey data for all applications in the date range when it is provided', async () => {
+            const ghostPeriod = 20
+
+            const mockGhostPeriod = require('../setting-service.js').ghostPeriod
+            const mockSelectApplications =
+                require('../../persistence/application-persistence.js').selectApplications
+
+            const mockSelectEventsByApplicationId =
+                require('../../persistence/application-persistence.js').selectEventsByApplicationId
+
+            const mockGetSankeyData =
+                require('../sankey-service.js').getSankeyData
+
+            const mockApplication1 = {
+                id: 1,
+                companyId: 'companyId',
+                lastUpdated: dateString10DaysAgo,
+            }
+            const mockApplication2 = {
+                id: 2,
+                companyId: 'companyId',
+                lastUpdated: dateString10DaysAgo,
+            }
+
+            const mockEvents = [
+                {
+                    statusId: 1,
+                },
+                {
+                    statusId: 2,
+                },
+            ]
+
+            const mockSankeyData = {
+                nodes: [],
+                links: [],
+            }
+
+            const beginningPeriod = generateDateStringForDaysAgo(20)
+            const endingPeriod = generateDateStringForDaysAgo(5)
+
+            mockGhostPeriod.mockReturnValue(ghostPeriod)
+            mockSelectApplications.mockResolvedValue([
+                mockApplication1,
+                mockApplication2,
+            ])
+
+            mockGetSankeyData.mockResolvedValue(mockSankeyData)
+
+            mockSelectEventsByApplicationId.mockResolvedValue(mockEvents)
+
+            const result = await getAllApplicationSankeyData(beginningPeriod, endingPeriod)
+
+            expect(result).toEqual(mockSankeyData)
+
+            expect(mockSelectApplications).toHaveBeenCalledWith(
+                false,
+                beginningPeriod,
+                endingPeriod,
                 true
             )
 

@@ -173,9 +173,9 @@ export default function (ipcMain) {
             })
     })
 
-    ipcMain.on(requestAllApplicationSankeyData, async (event) => {
+    ipcMain.on(requestAllApplicationSankeyData, async (event, beginningPeriod, endingPeriod) => {
         logger.debug('Requesting all application sankey data')
-        getAllApplicationSankeyData()
+        getAllApplicationSankeyData(beginningPeriod, endingPeriod)
             .then((sankeyData) => {
                 logger.debug(`Found all application sankey data`)
                 event.reply(responseAllApplicationSankeyData, sankeyData)

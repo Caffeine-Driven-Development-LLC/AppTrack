@@ -98,7 +98,7 @@ export async function getAllActiveApplications() {
     const day = cutoffDate.getDate().toString().padStart(2, '0')
     const cutoffDateString = `${year}-${month}-${day}`
 
-    return selectApplications(false, cutoffDateString, false).then(
+    return selectApplications(false, cutoffDateString, null, false).then(
         (applications) => applications.map(populateGhostData)
     )
 }
@@ -136,8 +136,8 @@ export async function searchApplications(searchText) {
  * Returns data to populate a sankey chart with data from all applications.
  * @returns {Promise<{nodes: [], links: []}>} a promise that resolves to an object with nodes and links
  */
-export async function getAllApplicationSankeyData(startDate, endDate) {
-    return selectApplications(false, null, true)
+export async function getAllApplicationSankeyData(periodBeginning = null, periodEnding = null) {
+    return selectApplications(false, periodBeginning, periodEnding, true)
         .then((applications) => applications.map(populateGhostData))
         .then((applications) => Promise.all(applications.map(populateEvents)))
         .then((applications) => getSankeyData(applications))

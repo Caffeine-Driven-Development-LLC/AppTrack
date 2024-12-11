@@ -20,8 +20,8 @@ contextBridge.exposeInMainWorld('api', {
     openLink: (url) => ipcRenderer.send(requestOpenUrl, url),
 
     // TODO move this to other files
-    getAllApplicationsSankeyData: () =>
-        ipcRenderer.send(requestAllApplicationSankeyData),
+    getAllApplicationsSankeyData: (beginningPeriod, endingPeriod) =>
+        ipcRenderer.send(requestAllApplicationSankeyData, beginningPeriod, endingPeriod),
     onAllApplicationsSankeyData: (callback) =>
         ipcRenderer.on(responseAllApplicationSankeyData, callback),
 })

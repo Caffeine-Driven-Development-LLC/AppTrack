@@ -47,7 +47,8 @@ but for the time being it has a basic set of states.
 ## TODO for initial release
  - Unit tests!
  - Fix up stats page
-   - Add a date range filter to select applications that started in the range.
+  - Currently any application who's most recent event shows up in the stat page when searching by date, this should be refined so it shows events in that range.
+  - It would be nice to click on a element in the sankey chart and be taken to a applicaion list of thoes applications.
  - A website to describe the application with a download link.
  - Create Installer
    - Create a company

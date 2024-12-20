@@ -29,11 +29,10 @@ export default function () {
     }
 
     return (
-        <Stack>
+        <Stack spacing={2}>
             <Stack spacing={2} direction="row" >
                 <DatePicker
                     label="Start Date"
-                    size="small"
                     onChange={(date) =>
                         handleChange({
                             target: {
@@ -43,6 +42,7 @@ export default function () {
                         })
                     }
                     slotProps={{
+                        textField: { size: "small" },
                         field: {clearable: true, onClear: () => handleChange({
                             target: {
                                 id: 'startDate',
@@ -63,6 +63,7 @@ export default function () {
                         })
                     }
                     slotProps={{
+                        textField: { size: "small" },
                         field: {clearable: true, onClear: () => handleChange({
                                 target: {
                                     id: 'endDate',

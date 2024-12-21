@@ -133,6 +133,7 @@ export async function searchApplications(searchText) {
 }
 
 /**
+ * TODO move this into its own service that can better filter sankey data by date or other field.
  * Returns data to populate a sankey chart with data from all applications.
  * @returns {Promise<{nodes: [], links: []}>} a promise that resolves to an object with nodes and links
  */

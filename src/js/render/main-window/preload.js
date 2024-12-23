@@ -4,10 +4,6 @@ import ApplicationPreload from '../preload/application-preload.js'
 import SettingsPreload from '../preload/settings-preload.js'
 import EventFlowPreload from '../preload/event-flow-preload.js'
 import SankeyNodePreload from '../preload/sankey-node-preload.js'
-import {
-    requestAllApplicationSankeyData,
-    responseAllApplicationSankeyData,
-} from '../../shared/application-ipc-channels.js'
 import { requestOpenUrl } from '../../shared/misclanious-ipc-channels.js'
 
 CompanyPreload()
@@ -18,10 +14,4 @@ SankeyNodePreload()
 
 contextBridge.exposeInMainWorld('api', {
     openLink: (url) => ipcRenderer.send(requestOpenUrl, url),
-
-    // TODO move this to other files
-    getAllApplicationsSankeyData: (beginningPeriod, endingPeriod) =>
-        ipcRenderer.send(requestAllApplicationSankeyData, beginningPeriod, endingPeriod),
-    onAllApplicationsSankeyData: (callback) =>
-        ipcRenderer.on(responseAllApplicationSankeyData, callback),
 })

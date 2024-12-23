@@ -1,5 +1,4 @@
 import {
-    requestAllApplicationSankeyData,
     requestApplications,
     requestApplicationsForCompany,
     requestCreateApplication,
@@ -10,7 +9,6 @@ import {
     requestGetApplication,
     requestUpdateApplication,
     requestUpdateEvent,
-    responseAllApplicationSankeyData,
     responseApplication,
     responseApplicationDeleted,
     responseApplications,
@@ -169,20 +167,6 @@ export default function (ipcMain) {
             .catch((error) => {
                 logger.error(
                     `Error getting applications for company: ${error.message}`
-                )
-            })
-    })
-
-    ipcMain.on(requestAllApplicationSankeyData, async (event, beginningPeriod, endingPeriod) => {
-        logger.debug('Requesting all application sankey data beginningPeriod: ' + beginningPeriod + ' endingPeriod: ' + endingPeriod + '')
-        getAllApplicationSankeyData(beginningPeriod, endingPeriod)
-            .then((sankeyData) => {
-                logger.debug(`Found all application sankey data`)
-                event.reply(responseAllApplicationSankeyData, sankeyData)
-            })
-            .catch((error) => {
-                logger.error(
-                    `Error getting all application sankey data: ${error.message}`
                 )
             })
     })

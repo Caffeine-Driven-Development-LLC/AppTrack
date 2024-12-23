@@ -17,7 +17,3 @@ export const requestEventsForApplication = 'request-events-for-application'
 export const responseEventsForApplication = 'response-events-for-application'
 export const requestUpdateEvent = 'request-update-event'
 export const requestDeleteEvent = 'request-delete-event'
-
-export const requestAllApplicationSankeyData =
-    'get-all-applications-sankey-data'
-export const responseAllApplicationSankeyData = 'all-applications-sankey-data'

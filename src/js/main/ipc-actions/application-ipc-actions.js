@@ -18,7 +18,6 @@ import {
 import {
     addEvent,
     createNewApplication,
-    getAllApplicationSankeyData,
     getApplicationById,
     getApplications,
     getApplicationsByCompanyId,

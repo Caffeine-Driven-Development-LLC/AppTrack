@@ -137,8 +137,6 @@ AND recent_event.rn = 1;`
 
 const selectAllApplicationsSql = (
     includeDeleted,
-    periodBeginning,
-    periodEnding,
     showTerminated
 ) => `SELECT
 application.id              as id,
@@ -168,8 +166,6 @@ WHERE event.applicationStateId IS NOT NULL
 LEFT JOIN applicationStates applicationState ON recent_event.applicationStateId = applicationState.id
 WHERE ((${includeDeleted ? 1 : 0} = 1) OR (application.isDeleted = 0))
 AND recent_event.rn = 1
-AND (${periodBeginning} is null OR recent_event.date > '${periodBeginning}')
-AND (${periodEnding} is null OR recent_event.date < '${periodEnding}')
 AND ((${showTerminated ? 1 : 0} = 1) OR EXISTS(
 SELECT 1
 FROM applicationFlow flow

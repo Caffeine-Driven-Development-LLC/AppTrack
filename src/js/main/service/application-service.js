@@ -133,18 +133,6 @@ export async function searchApplications(searchText) {
 }
 
 /**
- * TODO move this into its own service that can better filter sankey data by date or other field.
- * Returns data to populate a sankey chart with data from all applications.
- * @returns {Promise<{nodes: [], links: []}>} a promise that resolves to an object with nodes and links
- */
-export async function getAllApplicationSankeyData(periodBeginning = null, periodEnding = null) {
-    return selectApplications(false, periodBeginning, periodEnding, true)
-        .then((applications) => applications.map(populateGhostData))
-        .then((applications) => Promise.all(applications.map(populateEvents)))
-        .then((applications) => getSankeyData(applications))
-}
-
-/**
  * Returns a summary of applications for a company. including sankey data for the applications.
  * @param companyId id of the company
  * @returns {Promise<{companyId, sankeyData: {nodes: [], links: []}, applications: Awaited<unknown>[]}>} a promise that resolves to an object with the company id, sankey data, and applications

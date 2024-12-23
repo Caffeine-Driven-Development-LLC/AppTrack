@@ -53,25 +53,11 @@ export default function ({ data, height }) {
                 ],
             },
             options: {
-                onClick: function (evt, elements) {
-                    if (elements.length > 0) {
-                        // TODO run a search on this data and navigate to applications page
-                        // const chart = this
-                        // const element =
-                        //     chart.getDatasetMeta(0).data[elements[0].index]
-                        // const flow = element.from.to.find(
-                        //     (n) => n.key === element.to.key
-                        // ).flow
-                        // console.log(
-                        //     `Clicked on link from ${element.from.key} to ${element.to.key} -> ${flow}`
-                        // )
-                    }
-                },
                 plugins: {
                     tooltip: {
                         displayColors: false,
                         callbacks: {
-                            label: function (context) {
+                            label(context) {
                                 const { dataset, dataIndex } = context
                                 const { from, to, flow } =
                                     dataset.data[dataIndex]

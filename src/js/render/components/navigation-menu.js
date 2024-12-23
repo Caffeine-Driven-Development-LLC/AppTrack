@@ -122,8 +122,6 @@ export default function () {
         <CompanyList />
     )
 
-    const statsNavItem = new NavItem('Stats', '/stats', <BarChart />, <Stats />)
-
     const settingsNavItem = new NavItem(
         'Settings',
         '/settings',
@@ -138,7 +136,6 @@ export default function () {
     const topNavItems = [
         applicationListNavItem,
         companyListNavItem,
-        statsNavItem,
     ]
     const bottomNavItems = [settingsNavItem]
 

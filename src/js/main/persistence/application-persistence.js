@@ -20,12 +20,11 @@ export async function selectApplication(id) {
 
 export async function selectApplications(
     includeDeleted = false,
-    periodBeginning = null,
-    periodEnding = null,
+    cutoffDate = null,
     showTerminated = false
 ) {
     return getDatabaseConnection().all(
-        selectAllApplicationsSql(includeDeleted, periodBeginning, periodEnding, showTerminated)
+        selectAllApplicationsSql(includeDeleted, cutoffDate, showTerminated)
     )
 }
 
@@ -137,6 +136,7 @@ AND recent_event.rn = 1;`
 
 const selectAllApplicationsSql = (
     includeDeleted,
+    cutoffDate,
     showTerminated
 ) => `SELECT
 application.id              as id,
@@ -166,6 +166,7 @@ WHERE event.applicationStateId IS NOT NULL
 LEFT JOIN applicationStates applicationState ON recent_event.applicationStateId = applicationState.id
 WHERE ((${includeDeleted ? 1 : 0} = 1) OR (application.isDeleted = 0))
 AND recent_event.rn = 1
+AND (${cutoffDate} is null OR recent_event.date >= ${cutoffDate})
 AND ((${showTerminated ? 1 : 0} = 1) OR EXISTS(
 SELECT 1
 FROM applicationFlow flow

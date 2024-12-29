@@ -23,6 +23,8 @@ export async function selectApplications(
     cutoffDate = null,
     showTerminated = false
 ) {
+    console.log(selectAllApplicationsSql(includeDeleted, cutoffDate, showTerminated))
+
     return getDatabaseConnection().all(
         selectAllApplicationsSql(includeDeleted, cutoffDate, showTerminated)
     )
@@ -166,7 +168,7 @@ WHERE event.applicationStateId IS NOT NULL
 LEFT JOIN applicationStates applicationState ON recent_event.applicationStateId = applicationState.id
 WHERE ((${includeDeleted ? 1 : 0} = 1) OR (application.isDeleted = 0))
 AND recent_event.rn = 1
-AND (${cutoffDate} is null OR recent_event.date >= ${cutoffDate})
+AND (${cutoffDate} is null OR recent_event.date > '${cutoffDate}')
 AND ((${showTerminated ? 1 : 0} = 1) OR EXISTS(
 SELECT 1
 FROM applicationFlow flow

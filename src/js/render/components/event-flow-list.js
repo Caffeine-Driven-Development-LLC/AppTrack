@@ -102,7 +102,7 @@ export default function ({ label }) {
                         variant="contained"
                         onClick={openEventInputModal}
                     >
-                        Add new step
+                        Add new event
                     </Button>
                 </Stack>
                 <Help onClick={() => setIsHelpModalOpen(true)} />

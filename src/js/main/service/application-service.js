@@ -98,7 +98,7 @@ export async function getAllActiveApplications() {
     const day = cutoffDate.getDate().toString().padStart(2, '0')
     const cutoffDateString = `${year}-${month}-${day}`
 
-    return selectApplications(false, cutoffDateString, null, false).then(
+    return selectApplications(false, cutoffDateString, false).then(
         (applications) => applications.map(populateGhostData)
     )
 }

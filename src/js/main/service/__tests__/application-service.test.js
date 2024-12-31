@@ -483,7 +483,6 @@ describe('ApplicationServiceTests', function () {
             expect(mockSelectApplications).toHaveBeenCalledWith(
                 false,
                 cutoffDateString,
-                null,
                 false
             )
         })
@@ -543,7 +542,6 @@ describe('ApplicationServiceTests', function () {
             expect(mockSelectApplications).toHaveBeenCalledWith(
                 false,
                 cutoffDateString,
-                null,
                 false
             )
             expect(mockSelectApplications).toHaveBeenCalledTimes(1)
@@ -606,7 +604,6 @@ describe('ApplicationServiceTests', function () {
             expect(mockSelectApplications).toHaveBeenCalledWith(
                 false,
                 cutoffDateString,
-                null,
                 false
             )
             expect(mockSelectApplications).toHaveBeenCalledTimes(1)

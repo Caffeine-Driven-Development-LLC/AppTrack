@@ -230,7 +230,7 @@ export default function ({ onClose: onClose, application: application }) {
                 <TextField
                     size="small"
                     id="postUrl"
-                    label="Link"
+                    label="URL"
                     variant="outlined"
                     value={applicationInput.postUrl || ''}
                     onChange={handleChange}

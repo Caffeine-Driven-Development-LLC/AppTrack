@@ -1,7 +1,7 @@
 import { saveLogo } from '../persistence/media-persistence.js'
 import logger from '../logger.js'
 
-const validImageFileTypes = ['png', 'jpeg', 'gif']
+const validImageFileTypes = ['png', 'jpeg', 'gif', 'webp']
 
 /**
  * Saves an image to the file system and returns the path to the image.

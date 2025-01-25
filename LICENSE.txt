@@ -1,5 +1,0 @@
-Copyright (c) 2024 Ian McNaughton
-
-All rights reserved.
-
-No part of this software and related documentation may be reproduced, distributed, or transmitted in any form or by any means, without the prior written permission of the author.

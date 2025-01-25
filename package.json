@@ -1,7 +1,7 @@
 {
   "name": "apptrack",
   "description": "App Track! A desktop application to help track your job applications",
-  "license": "All rights reserved",
+  "license": "GPL-3.0-only",
   "main": "./.webpack/main",
   "version": "0.2.0",
   "scripts": {

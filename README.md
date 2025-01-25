@@ -1,3 +1,5 @@
+[![Node.js CI](https://github.com/Caffien-Driven-Development/AppTrack/actions/workflows/node.js.yml/badge.svg)](https://github.com/Caffien-Driven-Development/AppTrack/actions/workflows/node.js.yml)
+
 # App Track
 
 A desktop application to help job seekers better track and organize their job search. 

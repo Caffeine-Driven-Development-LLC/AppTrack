@@ -1,6 +1,5 @@
 <h1 align="center">App Track</h1>
 <p align="center">
-  <br/>
   <img src="img/AppTrackGhost.svg" alt="AppTrack Ghost" width="100">
 </p>
 <p>

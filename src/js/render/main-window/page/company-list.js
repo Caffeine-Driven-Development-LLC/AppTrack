@@ -5,7 +5,7 @@ import {
     Button,
     IconButton,
     InputAdornment,
-    List,
+    List, ListItem,
     ListItemButton,
     Stack,
     TextField,
@@ -125,17 +125,28 @@ export default function ({ initialSearchText }) {
                 />
             </Stack>
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-                {displayedCompanies.map((c) => (
-                    <ListItemButton
-                        key={c.id}
-                        divider={true}
-                        onClick={(event) => {
-                            handleOnClickCompanyDetails(event, c)
-                        }}
-                    >
-                        <CompanyOverview company={c} />
-                    </ListItemButton>
-                ))}
+                {displayedCompanies.length === 0 ? (
+                    <ListItem sx={{ justifyContent: 'center', py: 4 }}>
+                        {searchText ? (
+                            'No companies found for search term "' + searchText + '"'
+                        ) :(
+                            'No companies found'
+                        )}
+                    </ListItem>
+                ) : (
+                    displayedCompanies.map((c) => (
+                        <ListItemButton
+                            key={c.id}
+                            divider={true}
+                            onClick={(event) => {
+                                handleOnClickCompanyDetails(event, c)
+                            }}
+                        >
+                            <CompanyOverview company={c} />
+                        </ListItemButton>
+                    ))
+                )}
+
             </List>
             <Modal
                 isOpen={isCreateCompanyModalOpen}

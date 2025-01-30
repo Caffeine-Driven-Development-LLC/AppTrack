@@ -23,8 +23,6 @@ export async function selectApplications(
     cutoffDate = null,
     showTerminated = false
 ) {
-    console.log(selectAllApplicationsSql(includeDeleted, cutoffDate, showTerminated))
-
     return getDatabaseConnection().all(
         selectAllApplicationsSql(includeDeleted, cutoffDate, showTerminated)
     )

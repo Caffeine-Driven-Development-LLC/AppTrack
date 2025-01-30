@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import Modal from '../../components/modal.js'
 import ApplicationInputEdit from '../../components/application-input-edit.js'
 import {
-    Button,
+    Button, CircularProgress,
     IconButton,
     InputAdornment,
     List, ListItem,
@@ -21,6 +21,7 @@ export default function ({ initialSearchText }) {
     const [isCreateApplicationModalOpen, setIsCreateApplicationModalOpen] =
         useState(false)
     const [searchText, setSearchText] = useState(initialSearchText || '')
+    const [isLoading, setIsLoading] = useState(true)
     const searchDebounceRef = useRef(null)
 
     const { setViewHistory, viewHistory, pushView } = useContext(ViewContext)
@@ -52,11 +53,13 @@ export default function ({ initialSearchText }) {
 
     useEffect(() => {
         if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+        setIsLoading(true)
         searchDebounceRef.current = setTimeout(() => {
             window.applicationApi.getApplicationListItems({
                 searchText: searchText,
             })
-        }, 500)
+            setIsLoading(false)
+        }, 250)
     }, [searchText])
 
     useEffect(() => {
@@ -98,6 +101,41 @@ export default function ({ initialSearchText }) {
         }
     }, [])
 
+    const renderLoadingState = () => (
+        <ListItem sx={{ justifyContent: 'center', py: 4 }}>
+            <CircularProgress />
+        </ListItem>
+    )
+
+    const renderApplicationListEmptyState = () => (
+        <ListItem sx={{ justifyContent: 'center', py: 4 }}>
+            {searchText ? (
+                'No applications found for search term "' + searchText + '"'
+            ) : (
+                'No active applications'
+            )}
+        </ListItem>
+    )
+
+    const renderApplicationList = () => (
+        applications.map((a) => (
+            <ListItemButton
+                key={a.id}
+                divider={true}
+                onClick={(event) => {
+                    handleOnClickApplicationDetails(event, a)
+                }}
+            >
+                <ApplicationOverview
+                    application={a}
+                    onApplicationStatusChange={() =>
+                        handleApplicationStatusChange(a.id)
+                    }
+                />
+            </ListItemButton>
+        ))
+    )
+
     return (
         <Stack spacing={2}>
             <Stack direction="row" justifyContent="space-between">
@@ -135,32 +173,12 @@ export default function ({ initialSearchText }) {
                 />
             </Stack>
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-                {applications.length === 0 ? (
-                    <ListItem sx={{ justifyContent: 'center', py: 4 }}>
-                        {searchText ? (
-                            'No applications found for search term "' + searchText + '"'
-                        ) :(
-                            'No active applications'
-                        )}
-                    </ListItem>
-                ) : (
-                    applications.map((a) => (
-                        <ListItemButton
-                            key={a.id}
-                            divider={true}
-                            onClick={(event) => {
-                                handleOnClickApplicationDetails(event, a)
-                            }}
-                        >
-                            <ApplicationOverview
-                                application={a}
-                                onApplicationStatusChange={() =>
-                                    handleApplicationStatusChange(a.id)
-                                }
-                            />
-                        </ListItemButton>
-                    ))
-                )}
+                {
+                    isLoading ? renderLoadingState() :
+                        applications.length === 0 ?
+                            renderApplicationListEmptyState() :
+                            renderApplicationList()
+                }
             </List>
             <Modal
                 isOpen={isCreateApplicationModalOpen}

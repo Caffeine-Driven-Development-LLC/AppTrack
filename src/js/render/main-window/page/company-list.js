@@ -2,7 +2,7 @@ import { useContext, useEffect, useRef, useState } from 'react'
 import Modal from '../../components/modal.js'
 import CompanyInputEdit from '../../components/company-input-edit.js'
 import {
-    Button,
+    Button, CircularProgress,
     IconButton,
     InputAdornment,
     List, ListItem,
@@ -22,6 +22,7 @@ export default function ({ initialSearchText }) {
     const [isCreateCompanyModalOpen, setIsCreateCompanyModalOpen] =
         useState(false)
     const [searchText, setSearchText] = useState(initialSearchText || '')
+    const [isLoading, setIsLoading] = useState(true)
     const searchDebounceRef = useRef(null)
 
     const { viewHistory, setViewHistory, pushView } = useContext(ViewContext)
@@ -47,6 +48,7 @@ export default function ({ initialSearchText }) {
 
     useEffect(() => {
         if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
+        setIsLoading(true)
         searchDebounceRef.current = setTimeout(() => {
             if (searchText) {
                 setDisplayedCompanies(
@@ -57,7 +59,8 @@ export default function ({ initialSearchText }) {
             } else {
                 setDisplayedCompanies(companies)
             }
-        }, 500)
+            setIsLoading(false)
+        }, 250)
     }, [searchText, companies])
 
     useEffect(() => {
@@ -85,11 +88,40 @@ export default function ({ initialSearchText }) {
         })
 
         window.companyApi.getCompanies({ showDeleted: false })
-
         return () => {
             window.companyApi.removeListeners()
         }
     }, [])
+
+    const renderLoadingState = () => (
+        <ListItem sx={{ justifyContent: 'center', py: 4 }}>
+            <CircularProgress />
+        </ListItem>
+    )
+
+    const renderEmptyState = () => {
+        return <ListItem sx={{ justifyContent: 'center', py: 4 }}>
+            {searchText ? (
+                'No companies found for search term "' + searchText + '"'
+            ) : (
+                'No companies found'
+            )}
+        </ListItem>
+    }
+
+    const renderCompaniesList = () => {
+        return displayedCompanies.map((c) => (
+            <ListItemButton
+                key={c.id}
+                divider={true}
+                onClick={(event) => {
+                    handleOnClickCompanyDetails(event, c)
+                }}
+            >
+                <CompanyOverview company={c} />
+            </ListItemButton>
+        ))
+    }
 
     return (
         <Stack spacing={2}>
@@ -125,28 +157,13 @@ export default function ({ initialSearchText }) {
                 />
             </Stack>
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-                {displayedCompanies.length === 0 ? (
-                    <ListItem sx={{ justifyContent: 'center', py: 4 }}>
-                        {searchText ? (
-                            'No companies found for search term "' + searchText + '"'
-                        ) :(
-                            'No companies found'
-                        )}
-                    </ListItem>
-                ) : (
-                    displayedCompanies.map((c) => (
-                        <ListItemButton
-                            key={c.id}
-                            divider={true}
-                            onClick={(event) => {
-                                handleOnClickCompanyDetails(event, c)
-                            }}
-                        >
-                            <CompanyOverview company={c} />
-                        </ListItemButton>
-                    ))
-                )}
-
+                {
+                    isLoading ?
+                        renderLoadingState() :
+                            displayedCompanies.length === 0 ?
+                                renderEmptyState() :
+                                renderCompaniesList()
+                }
             </List>
             <Modal
                 isOpen={isCreateCompanyModalOpen}

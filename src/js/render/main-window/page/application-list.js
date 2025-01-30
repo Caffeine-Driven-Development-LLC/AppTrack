@@ -5,7 +5,7 @@ import {
     Button,
     IconButton,
     InputAdornment,
-    List,
+    List, ListItem,
     ListItemButton,
     Stack,
     TextField,
@@ -135,22 +135,32 @@ export default function ({ initialSearchText }) {
                 />
             </Stack>
             <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
-                {applications.map((a) => (
-                    <ListItemButton
-                        key={a.id}
-                        divider={true}
-                        onClick={(event) => {
-                            handleOnClickApplicationDetails(event, a)
-                        }}
-                    >
-                        <ApplicationOverview
-                            application={a}
-                            onApplicationStatusChange={() =>
-                                handleApplicationStatusChange(a.id)
-                            }
-                        />
-                    </ListItemButton>
-                ))}
+                {applications.length === 0 ? (
+                    <ListItem sx={{ justifyContent: 'center', py: 4 }}>
+                        {searchText ? (
+                            'No applications found for search term "' + searchText + '"'
+                        ) :(
+                            'No active applications'
+                        )}
+                    </ListItem>
+                ) : (
+                    applications.map((a) => (
+                        <ListItemButton
+                            key={a.id}
+                            divider={true}
+                            onClick={(event) => {
+                                handleOnClickApplicationDetails(event, a)
+                            }}
+                        >
+                            <ApplicationOverview
+                                application={a}
+                                onApplicationStatusChange={() =>
+                                    handleApplicationStatusChange(a.id)
+                                }
+                            />
+                        </ListItemButton>
+                    ))
+                )}
             </List>
             <Modal
                 isOpen={isCreateApplicationModalOpen}

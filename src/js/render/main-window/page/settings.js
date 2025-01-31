@@ -234,8 +234,8 @@ export default function () {
                         preserved.
                     </Typography>
                     <Typography>
-                        This action cannot be undone. Please type "DELETE" to
-                        confirm.
+                        This action cannot be undone. Please type "DELETE"
+                        to confirm.
                     </Typography>
                     <TextField
                         size="small"

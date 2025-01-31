@@ -252,7 +252,7 @@ export default function ({ label }) {
                     </Typography>
                     <Typography paragraph>
                         When customizing, you also have the ability to define
-                        what, if any, next steps are available within your
+                        what (if any) next steps are available within your
                         application process.
                     </Typography>
                     <Typography paragraph>
@@ -267,20 +267,20 @@ export default function ({ label }) {
                         process, receiving an offer, or declining an offer.
                     </Typography>
                     <Typography paragraph>
-                        The order of steps within the process can be changed
-                        using the arrow keys. Applications will be sorted in
-                        reverse order of the current step they are currently on.
-                        It is recommended to order the steps that the closer the
-                        process is to completion, the lower it appears on the
-                        list.
+                        Steps can also be classified as Initial Steps. Initial
+                        steps should mark any step that is the primary step in
+                        the application process. For instance, "Applied."
+                        Please note that every application requires an Initial
+                        Step - if you only have one classified within your list,
+                        it will be the default for every new application.
                     </Typography>
                     <Typography paragraph>
-                        Steps can also be marked as an initial step, This should
-                        mark any step that is the first step in the application
-                        process. If there is only 1 initial step, when logging a
-                        new application, it will automatically be of that step,
-                        otherwise the user will be prompted to select the
-                        initial step from the set of initial steps.
+                        The order of steps within the process can be changed
+                        using the arrow keys. Applications will be sorted in
+                        reverse order of the current step they are currently
+                        on. It is recommended to order the steps that the
+                        closer the process is to completion, the lower it
+                        appears on the list.
                     </Typography>
                 </Stack>
             </Modal>

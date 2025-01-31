@@ -128,17 +128,17 @@ export default function () {
                     <Typography paragraph>
                         You can add, edit, or remove any node you would like
                         shown in the sankey graphs, as well as associate any
-                        application steps with the nodes, or change the color of
-                        the node.
+                        application steps with the nodes, or change the color
+                        of the node.
                     </Typography>
                     <Typography paragraph>
                         Multiple application steps can be mapped to the same
-                        node if you chose, This can simplify a graph and
-                        obfuscate steps your applications have taken if you
-                        chose. For instance, Lets say you have 2 different types
-                        of interviews defined as application steps (A technical,
-                        and behavioral interview) , you can condense them down
-                        to a single 'interview' node in the sankey graph.
+                        node, if desired. This can simplify a graph and
+                        obfuscate steps your applications have taken. For
+                        example: If you have 2 different types of interviews
+                        defined as application steps (A technical, and
+                        behavioral interview), you can condense them down to a
+                        single 'interview' node in the sankey graph.
                     </Typography>
                 </Stack>
             </Modal>

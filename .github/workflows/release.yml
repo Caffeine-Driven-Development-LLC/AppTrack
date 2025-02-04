@@ -28,7 +28,7 @@ jobs:
         run: npm run make
 
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4.6.0
         with:
           name: electron-forge-build-${{ runner.os }}
           path: out/make/**/*

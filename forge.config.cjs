@@ -9,20 +9,16 @@ module.exports = {
   },
   rebuildConfig: {},
   makers: [
-    // {
-    //   name: '@electron-forge/maker-squirrel',
-    //   config: {
-    //
-    //   }
-    // },
+    {
+      name: '@electron-forge/maker-squirrel',
+      config: {
+
+      }
+    },
     {
       name: '@electron-forge/maker-dmg',
       icon: './img/icon.icns',
       format: 'ULFO',
-      platforms: ['darwin'],
-    },
-    {
-      name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
     },
   ],

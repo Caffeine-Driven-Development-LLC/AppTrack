@@ -9,18 +9,12 @@ module.exports = {
   },
   rebuildConfig: {},
   makers: [
-    {
-      name: '@electron-forge/maker-appx',
-      config: {
-        publisher: 'CN=developmentca',
-      }
-    },
-    {
-      name: '@electron-forge/maker-squirrel',
-      config: {
-
-      }
-    },
+    // {
+    //   name: '@electron-forge/maker-squirrel',
+    //   config: {
+    //
+    //   }
+    // },
     {
       name: '@electron-forge/maker-dmg',
       icon: './img/icon.icns',

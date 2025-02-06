@@ -12,7 +12,8 @@ module.exports = {
     {
       name: '@electron-forge/maker-squirrel',
       config: {
-
+        iconUrl: 'https://getapptrack.com/icon.ico',
+        setupIcon: './img/icon.icns'
       }
     },
     {

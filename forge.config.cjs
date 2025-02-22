@@ -15,6 +15,9 @@ module.exports = {
         language: 1033,
         manufacturer: 'Caffeine Driven Development'
       }
+    },
+    {
+      name: '@electron-forge/maker-appx',
     }
   ],
   plugins: [

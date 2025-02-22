@@ -16,9 +16,6 @@ module.exports = {
         manufacturer: 'Caffeine Driven Development'
       }
     },
-    {
-      name: '@electron-forge/maker-appx',
-    }
   ],
   plugins: [
     {

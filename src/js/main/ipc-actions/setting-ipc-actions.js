@@ -1,9 +1,7 @@
 import {
-    requestCheckForUpdates,
     requestDeleteAllData,
     requestDeleteApplicationData,
     requestGetSettings,
-    requestSetAutoCheckForUpdates,
     requestSetDisplayTheme,
     requestSetGhostPeriod,
     responseSettings,
@@ -12,11 +10,9 @@ import {
     deleteAllData,
     deleteApplicationData,
     getSettings,
-    setAutoCheckForUpdates,
     setDisplayTheme,
     setGhostPeriod,
 } from '../service/setting-service.js'
-import { checkForUpdate } from '../service/application-update-service.js'
 import logger from '../logger.js'
 
 export default function (ipcMain) {
@@ -34,15 +30,6 @@ export default function (ipcMain) {
         logger.debug('Setting display theme')
         setDisplayTheme(args)
         event.reply(responseSettings, getSettings())
-    })
-
-    ipcMain.on(requestSetAutoCheckForUpdates, async (event, args) => {
-        logger.debug('Setting auto check for updates')
-        setAutoCheckForUpdates(args)
-    })
-
-    ipcMain.on(requestCheckForUpdates, async () => {
-        checkForUpdate()
     })
 
     ipcMain.on(requestDeleteApplicationData, async () => {

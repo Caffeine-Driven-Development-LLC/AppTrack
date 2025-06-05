@@ -57,4 +57,16 @@ module.exports = {
       }
     }
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'Caffeine-Driven-Development-LLC',
+          name: 'AppTrack'
+        },
+        prerelease: false
+      }
+    }
+  ],
 };

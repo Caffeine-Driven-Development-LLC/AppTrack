@@ -1,15 +1,16 @@
-import { app, autoUpdater } from 'electron'
+import { autoUpdater, app } from 'electron'
 import { autoCheckForUpdates } from './setting-service.js'
 import logger from '../logger.js'
 
 let intervalId = null
 let lastCheckDateTime = null
 
-const url = `http://localhost:4000/${process.platform}/${app.getVersion()}`
+const server = 'https://update.electronjs.org'
+const feed = `${server}/Caffeine-Driven-Development-LLC/AppTrack/${process.platform}-${process.arch}/${app.getVersion()}`
+autoUpdater.setFeedURL({ url: feed })
 
 export const initializeAutoUpdate = () => {
     logger.debug('Initializing auto update...')
-    autoUpdater.setFeedURL({ url })
 
     if (autoCheckForUpdates()) {
         startAutoUpdateCheck()

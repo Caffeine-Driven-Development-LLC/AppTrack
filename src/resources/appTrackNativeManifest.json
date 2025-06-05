@@ -1,7 +1,0 @@
-{
-	"name": "app_track",
-	"description": "Native messageing to the apptrack applicaion",
-	"path": "/home/ian/.config/apptrack/app-track.sock",
-	"type": "stdio",
-	"allowed_extensions": ["appTrack@getAppTrack.com"]
-}

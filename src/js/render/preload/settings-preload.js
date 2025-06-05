@@ -1,8 +1,9 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import {
+    requestCheckForUpdates,
     requestDeleteAllData,
     requestDeleteApplicationData,
-    requestGetSettings,
+    requestGetSettings, requestSetAutoCheckForUpdates,
     requestSetDisplayTheme,
     requestSetGhostPeriod,
     responseSettings,
@@ -14,6 +15,10 @@ export default function () {
         setGhostPeriod: (args) => ipcRenderer.send(requestSetGhostPeriod, args),
         setDisplayTheme: (args) =>
             ipcRenderer.send(requestSetDisplayTheme, args),
+        setAutoCheckForUpdates: (args) =>
+            ipcRenderer.send(requestSetAutoCheckForUpdates, args),
+
+        checkForUpdates: () => ipcRenderer.send(requestCheckForUpdates),
 
         onGetSettings: (callback) => ipcRenderer.on(responseSettings, callback),
 

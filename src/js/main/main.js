@@ -14,6 +14,7 @@ import {
     registerMediaActions,
     registerMediaProtocol,
 } from './protocol/media-protocol.js'
+import { initializeAutoUpdate } from './service/application-update-service.js'
 
 if (isFirstRun) {
     app.quit()
@@ -68,6 +69,7 @@ app.whenReady()
 
         createWindow()
     })
+    .then(initializeAutoUpdate)
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

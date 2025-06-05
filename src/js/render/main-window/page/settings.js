@@ -55,6 +55,19 @@ export default function () {
         }
     }
 
+    const handleAutoUpdateSwitchChange = (event) => {
+        let value = event.target.checked
+        setSettings((prevState) => ({
+            ...prevState,
+            autoCheckForUpdates: value,
+        }))
+        window.settingsApi.setAutoCheckForUpdates(value)
+    }
+
+    const handleManualCheckForUpdates = (event) => {
+        window.settingsApi.checkForUpdates()
+    }
+
     const handleConfigureApplicationEventsButton = (event) => {
         event.stopPropagation()
         pushView(<EventFlowConfig />, 'Configure Application Events')
@@ -102,6 +115,29 @@ export default function () {
                 General
             </Typography>
             <Stack spacing={2} alignItems="flex-start" sx={{ paddingLeft: 2 }}>
+                <FormControl>
+                    <Stack direction="row">
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    size="small"
+                                    onChange={handleAutoUpdateSwitchChange}
+                                    checked={settings.autoCheckForUpdates}
+                                />
+                            }
+                            label="Automatically check for updates"
+                        />
+                        {!settings.autoCheckForUpdates && (
+                            <Button
+                                size="small"
+                                variant="contained"
+                                onClick={handleManualCheckForUpdates}
+                            >
+                                Check for updates
+                            </Button>
+                        )}
+                    </Stack>
+                </FormControl>
                 <FormControl>
                     <InputLabel id="displayThemeSelectBox">
                         Appearance

@@ -5,6 +5,7 @@ import { deleteAllApplications } from '../persistence/application-persistence.js
 import logger, { logFilePath } from '../logger.js'
 import { closeDatabaseConnection } from '../database-client.js'
 import { getMediaFolderPath } from '../persistence/media-persistence.js'
+import { startAutoUpdateCheck, stopAutoUpdateCheck } from './application-update-service.js'
 
 const { app, nativeTheme } = electron
 
@@ -18,6 +19,7 @@ const getDefaultSettings = () => {
         ghostPeriod: 30,
         databasePath: path.join(app.getPath('userData'), databaseFileName),
         displayTheme: 'system',
+        autoCheckForUpdates: true,
     }
 }
 const getSettingsFilePath = () => path.join(app.getPath('userData'), settingsFileName)
@@ -67,6 +69,16 @@ export function setDatabasePath(databasePath) {
 
 export function setDisplayTheme(displayTheme) {
     saveSetting('displayTheme', displayTheme)
+}
+
+export function setAutoCheckForUpdates(autoCheckForUpdates) {
+    saveSetting('autoCheckForUpdates', autoCheckForUpdates)
+
+    if (autoCheckForUpdates) {
+        startAutoUpdateCheck()
+    } else {
+        stopAutoUpdateCheck()
+    }
 }
 
 export function deleteApplicationData() {

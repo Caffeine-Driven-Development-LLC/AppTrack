@@ -10,7 +10,6 @@ import { setDatabaseConnection } from './database-client.js'
 import { requestOpenUrl } from '../shared/misclanious-ipc-channels.js'
 import { responseSettings } from '../shared/settings-ipc-channels.js'
 import logger from './logger.js'
-import { initializeAutoUpdate } from './service/application-update-service.js'
 import {
     registerMediaActions,
     registerMediaProtocol,
@@ -69,7 +68,6 @@ app.whenReady()
 
         createWindow()
     })
-    .then(initializeAutoUpdate)
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {

@@ -10,17 +10,11 @@ module.exports = {
   rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-squirrel',
+      name: '@electron-forge/maker-wix',
       config: {
-        iconUrl: 'https://getapptrack.com/icon.ico',
-        setupIcon: './img/icon.icns'
+        language: 1033,
+        manufacturer: 'Caffeine Driven Development'
       }
-    },
-    {
-      name: '@electron-forge/maker-dmg',
-      icon: './img/icon.icns',
-      format: 'ULFO',
-      platforms: ['darwin'],
     },
   ],
   plugins: [

@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest]
+        os: [ windows-latest, macos-latest ]
 
     steps:
       - name: Checkout repository
@@ -29,13 +29,17 @@ jobs:
       - name: Build and Package App
         run: npm run make
 
-      - name: Upload Artifacts
+      - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4.6.0
         with:
-          name: electron-forge-build-${{ runner.os }}
-          path: out/make/**/*
+          name: electron-forge-build-${{ matrix.os }}
+          path: |
+            out/make/squirrel.windows/* 
+            out/make/dmg/*
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: out/make/**/*
+          files: |
+            out/make/squirrel.windows/*
+            out/make/dmg/*

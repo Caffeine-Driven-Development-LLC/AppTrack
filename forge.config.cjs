@@ -4,8 +4,14 @@ module.exports = {
     name: 'App Track',
     icon: './img/icon',
   },
-  rebuildConfig: {},
   makers: [
+    {
+      name: '@electron-forge/maker-dmg',
+      platforms: ['darwin'],
+      config: {
+        format: 'ULFO'
+      }
+    }
   ],
   plugins: [
     {

@@ -1,6 +1,3 @@
-const path = require('path');
-const { notarize } = require('electron-notarize');
-
 module.exports = {
   packagerConfig: {
     appBundleId: 'com.caffeinedrivendevelopment.apptrack',
@@ -11,8 +8,6 @@ module.exports = {
       identity: 'Developer ID Application: Caffeine Driven Development LLC (A38C7G546Q)',
       hardenedRuntime: true,
       entitlements: 'entitlements.plist',
-      'entitlements-inherit': 'entitlements.plist',
-      'signature-flags': 'library',
     },
     osxNotarize: {
       appleId: process.env.APPLE_ID,
@@ -49,19 +44,19 @@ module.exports = {
     }
   ],
   hooks: {
-    async afterSign(config) {
-      const appPath = path.join(
-          config.appOutDir,
-          `${config.packagerConfig.name}.app`
-      )
-
-      await notarize({
-        appBundleId: 'com.caffeinedrivendevelopment.apptrack',
-        appPath: appPath,
-        appleId: process.env.APPLE_ID || '',
-        appleIdPassword: process.env.APPLE_ID_PASSWORD || '',
-        teamId: process.env.APPLE_TEAM_ID || ''
-      })
-    }
+    // async afterSign(config) {
+    //   const appPath = path.join(
+    //       config.appOutDir,
+    //       `${config.packagerConfig.name}.app`
+    //   )
+    //
+    //   await notarize({
+    //     appBundleId: 'com.caffeinedrivendevelopment.apptrack',
+    //     appPath: appPath,
+    //     appleId: process.env.APPLE_ID || '',
+    //     appleIdPassword: process.env.APPLE_ID_PASSWORD || '',
+    //     teamId: process.env.APPLE_TEAM_ID || ''
+    //   })
+    // }
   }
 };

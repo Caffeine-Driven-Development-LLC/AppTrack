@@ -41,22 +41,10 @@ module.exports = {
           }]
         }
       }
+    },
+    {
+      name: '@electron-forge/plugin-auto-unpack-natives',
+      config: {}
     }
   ],
-  hooks: {
-    // async afterSign(config) {
-    //   const appPath = path.join(
-    //       config.appOutDir,
-    //       `${config.packagerConfig.name}.app`
-    //   )
-    //
-    //   await notarize({
-    //     appBundleId: 'com.caffeinedrivendevelopment.apptrack',
-    //     appPath: appPath,
-    //     appleId: process.env.APPLE_ID || '',
-    //     appleIdPassword: process.env.APPLE_ID_PASSWORD || '',
-    //     teamId: process.env.APPLE_TEAM_ID || ''
-    //   })
-    // }
-  }
 };

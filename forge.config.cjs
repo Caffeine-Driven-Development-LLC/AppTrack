@@ -5,7 +5,7 @@ module.exports = {
     name: 'App Track',
     icon: './img/icon',
     osxSign: {
-      identity: 'Developer ID Application: Caffeine Driven Development LLC (A38C7G546Q)',
+      identity: process.env.SIGN_IDENTITY,
       hardenedRuntime: true,
       entitlements: 'entitlements.plist',
     },

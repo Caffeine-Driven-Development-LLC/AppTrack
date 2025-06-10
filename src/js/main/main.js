@@ -14,7 +14,7 @@ import {
     registerMediaActions,
     registerMediaProtocol,
 } from './protocol/media-protocol.js'
-import { initializeAutoUpdate } from './service/application-update-service.js'
+import { getUpdateState, initializeAutoUpdate } from './service/application-update-service.js'
 
 if (isFirstRun) {
     app.quit()
@@ -49,6 +49,10 @@ const createWindow = () => {
     if (process.env.NODE_ENV === 'development') {
         mainWindow.webContents.openDevTools()
     }
+
+    mainWindow.webContents.once('did-finish-load', () => {
+        window.webContents.send('update-state-changed', getUpdateState() );
+    })
 }
 
 app.whenReady()

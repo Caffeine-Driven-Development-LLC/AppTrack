@@ -3,7 +3,7 @@
   "description": "App Track! A desktop application to help track your job applications",
   "license": "GPL-3.0-only",
   "main": "./.webpack/main",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "url": "https://github.com/Caffeine-Driven-Development-LLC/AppTrack.git",
   "scripts": {
     "clean": "rm -rf .webpack",
@@ -23,6 +23,7 @@
     "@babel/preset-react": "^7.23.3",
     "@electron-forge/cli": "^7.3.1",
     "@electron-forge/maker-dmg": "^7.8.1",
+    "@electron-forge/maker-zip": "^7.8.1",
     "@electron-forge/plugin-auto-unpack-natives": "^7.8.1",
     "@electron-forge/plugin-fuses": "^7.3.1",
     "@electron-forge/plugin-webpack": "^7.3.1",

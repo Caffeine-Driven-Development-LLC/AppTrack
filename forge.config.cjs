@@ -22,6 +22,10 @@ module.exports = {
       config: {
         format: 'ULFO'
       }
+    },
+    {
+      name: '@electron-forge/maker-zip',
+      platforms: ['darwin']
     }
   ],
   plugins: [

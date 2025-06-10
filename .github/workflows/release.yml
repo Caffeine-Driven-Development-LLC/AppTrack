@@ -54,10 +54,10 @@ jobs:
         with:
           name: electron-forge-build-${{ matrix.os }}
           path: | 
-            out/make/dmg/*
+            out/make/*
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            out/make/dmg/*
+            out/make/*

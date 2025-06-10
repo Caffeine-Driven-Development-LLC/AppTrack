@@ -60,4 +60,5 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            out/make/*
+            out/make/*.dmg
+            out/make/zip/darwin/arm64/*.zip

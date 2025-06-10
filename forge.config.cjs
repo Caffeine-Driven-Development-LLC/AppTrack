@@ -1,44 +1,30 @@
-const { FusesPlugin } = require('@electron-forge/plugin-fuses');
-const { FuseV1Options, FuseVersion } = require('@electron/fuses');
-
 module.exports = {
   packagerConfig: {
+    appBundleId: 'com.caffeinedrivendevelopment.apptrack',
     asar: true,
     name: 'App Track',
     icon: './img/icon',
+    osxSign: {
+      identity: process.env.SIGN_IDENTITY,
+      hardenedRuntime: true,
+      entitlements: 'entitlements.plist',
+    },
+    osxNotarize: {
+      appleId: process.env.APPLE_ID,
+      appleIdPassword: process.env.APPLE_ID_PASSWORD,
+      teamId: process.env.APPLE_TEAM_ID,
+    },
   },
-  rebuildConfig: {},
   makers: [
     {
-      name: '@electron-forge/maker-squirrel',
-      config: {
-        iconUrl: 'https://getapptrack.com/icon.ico',
-        setupIcon: './img/icon.ico',
-      }
-    },
-    {
       name: '@electron-forge/maker-dmg',
-      icon: './img/icon.icns',
-      format: 'ULFO',
       platforms: ['darwin'],
+      config: {
+        format: 'ULFO'
+      }
     }
   ],
   plugins: [
-    {
-      name: '@electron-forge/plugin-auto-unpack-natives',
-      config: {},
-    },
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
-    new FusesPlugin({
-      version: FuseVersion.V1,
-      [FuseV1Options.RunAsNode]: false,
-      [FuseV1Options.EnableCookieEncryption]: true,
-      [FuseV1Options.EnableNodeOptionsEnvironmentVariable]: false,
-      [FuseV1Options.EnableNodeCliInspectArguments]: false,
-      [FuseV1Options.EnableEmbeddedAsarIntegrityValidation]: true,
-      [FuseV1Options.OnlyLoadAppFromAsar]: true,
-    }),
     {
       name: '@electron-forge/plugin-webpack',
       config: {
@@ -55,18 +41,10 @@ module.exports = {
           }]
         }
       }
-    }
-  ],
-  publishers: [
+    },
     {
-      name: '@electron-forge/publisher-github',
-      config: {
-        repository: {
-          owner: 'Caffeine-Driven-Development-LLC',
-          name: 'AppTrack'
-        },
-        prerelease: false
-      }
+      name: '@electron-forge/plugin-auto-unpack-natives',
+      config: {}
     }
   ],
 };

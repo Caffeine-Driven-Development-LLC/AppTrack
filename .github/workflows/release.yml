@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest, macos-latest ]
+        os: [ macos-latest ]
 
     steps:
       - name: Checkout repository
@@ -26,20 +26,38 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Decode signing certificate
+        run: |
+          echo "${{ secrets.MAC_CERT_P12 }}" | base64 -d > signing_cert.p12
+
+      - name: Setup macOS keychain
+        run: |
+          security create-keychain -p temp build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p temp build.keychain
+          security import signing_cert.p12 -k build.keychain -P "${{ secrets.MAC_CERT_P12_PASSWORD }}" -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k temp build.keychain
+
       - name: Build and Package App
+        env:
+          CSC_KEYCHAIN: build.keychain
+          CSC_LINK: signing_cert.p12
+          CSC_KEY_PASSWORD: ${{ secrets.MAC_CERT_P12_PASSWORD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          SIGN_IDENTITY: ${{ secrets.SIGN_IDENTITY }}
         run: npm run make
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4.6.0
         with:
           name: electron-forge-build-${{ matrix.os }}
-          path: |
-            out/make/squirrel.windows/* 
+          path: | 
             out/make/dmg/*
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            out/make/squirrel.windows/*
             out/make/dmg/*

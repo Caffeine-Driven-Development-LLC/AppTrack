@@ -26,6 +26,8 @@ export default function () {
     const [deleteConfirmationTextField, setDeleteConfirmationTextField] =
         useState('')
 
+    const [updateState, setUpdateState] = useState(null)
+
     const { pushView } = useContext(ViewContext)
 
     const onGetSettings = (event, args) => {
@@ -36,6 +38,11 @@ export default function () {
         window.settingsApi.onGetSettings(onGetSettings)
 
         window.settingsApi.getSettings()
+
+
+        window.updateApi.onUpdateStateChange((value) => {
+            setUpdateState(value)
+        });
 
         return () => {
             window.settingsApi.removeListener(onGetSettings)
@@ -138,6 +145,7 @@ export default function () {
                         )}
                     </Stack>
                 </FormControl>
+                <Typography>{JSON.stringify(updateState)}</Typography>
                 <FormControl>
                     <InputLabel id="displayThemeSelectBox">
                         Appearance

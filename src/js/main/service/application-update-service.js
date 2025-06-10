@@ -72,12 +72,14 @@ autoUpdater.on('update-available', () => {
     logger.debug('Update available')
     updateState.updateAvailable = true
     updateState.checkingForUpdate = false
+    broadcastUpdateState()
 })
 
 autoUpdater.on('update-downloaded', () => {
     logger.debug('Update downloaded')
     updateState.updateDownloaded = true
     updateState.checkingForUpdate = false
+    broadcastUpdateState()
 })
 
 autoUpdater.on('error', (error) => {
@@ -85,11 +87,13 @@ autoUpdater.on('error', (error) => {
     updateState.updateAvailable = false
     updateState.updateDownloaded = false
     updateState.checkingForUpdate = false
+    broadcastUpdateState()
 })
 
 autoUpdater.on('checking-for-update', () => {
     logger.debug('Checking for update...')
     updateState.checkingForUpdate = true
+    broadcastUpdateState()
 })
 
 autoUpdater.on('update-not-available', () => {
@@ -97,9 +101,11 @@ autoUpdater.on('update-not-available', () => {
     updateState.updateAvailable = false
     updateState.updateDownloaded = false
     updateState.checkingForUpdate = false
+    broadcastUpdateState()
 })
 
 function broadcastUpdateState() {
+    logger.debug(`Broadcasting update state: ${JSON.stringify(updateState)}`)
     BrowserWindow.getAllWindows().forEach((window) => {
         window.webContents.send('update-state-changed', updateState);
     });

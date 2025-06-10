@@ -51,7 +51,7 @@ const createWindow = () => {
     }
 
     mainWindow.webContents.once('did-finish-load', () => {
-        window.webContents.send('update-state-changed', getUpdateState() );
+        mainWindow.webContents.send('update-state-changed', getUpdateState() );
     })
 }
 

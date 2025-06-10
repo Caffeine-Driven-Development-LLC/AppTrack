@@ -15,3 +15,7 @@ SankeyNodePreload()
 contextBridge.exposeInMainWorld('api', {
     openLink: (url) => ipcRenderer.send(requestOpenUrl, url),
 })
+
+contextBridge.exposeInMainWorld('updateApi', {
+    onUpdateStateChange: (callback) => ipcRenderer.on('update-state-changed', (_event, value) => callback(value)),
+})

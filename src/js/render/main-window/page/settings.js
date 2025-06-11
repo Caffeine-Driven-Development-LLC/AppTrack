@@ -27,6 +27,7 @@ export default function () {
         useState('')
 
     const [updateState, setUpdateState] = useState(null)
+    const [currentAppVersion, setCurrentAppVersion] = useState('')
 
     const { pushView } = useContext(ViewContext)
 
@@ -38,13 +39,20 @@ export default function () {
         setUpdateState(args)
     }
 
+    const onGetCurrentAppVersion = (event, args) => {
+        setCurrentAppVersion(args)
+    }
+
     useEffect(() => {
         window.settingsApi.onGetSettings(onGetSettings)
         window.settingsApi.getSettings()
 
         window.updateApi.onGetUpdateState(onGetUpdateState)
-        window.updateApi.onUpdateStateChange(onGetUpdateState);
-        window.updateApi.getUpdateState();
+        window.updateApi.onUpdateStateChange(onGetUpdateState)
+        window.updateApi.getUpdateState()
+
+        window.updateApi.onGetCurrentAppVersion(onGetCurrentAppVersion)
+        window.updateApi.getCurrentAppVersion()
 
         return () => {
             window.settingsApi.removeListener(onGetSettings)
@@ -260,6 +268,8 @@ export default function () {
                         Delete All Data
                     </Button>
                 </Stack>
+
+                <Typography variant='body2'>Version: {currentAppVersion}</Typography>
             </Stack>
             <Modal
                 isOpen={showDeleteApplicationDataModal}

@@ -1,12 +1,12 @@
-import { checkForUpdate, getUpdateState } from '../service/application-update-service.js'
+import { checkForUpdate, getUpdateState, updateApplication } from '../service/application-update-service.js'
 import {
-    requestCheckForUpdates, requestUpdateApplication,
-    requestUpdateState,
+    requestCheckForUpdates, requestCurrentAppVersion, requestUpdateApplication,
+    requestUpdateState, responseCurrentAppVersion,
     responseUpdateState,
     updateStateChanged,
 } from '../../shared/update-ipc-channels.js'
 import logger from '../logger.js'
-import { updateApplication } from '../service/application-service.js'
+import { app } from 'electron'
 
 export function registerUpdateIpcActionsForWindow (window) {
 
@@ -29,5 +29,9 @@ export function registerUpdateIpcActions(ipcMain) {
     ipcMain.on(requestUpdateApplication, async () => {
         logger.debug('Requesting update application')
         updateApplication()
+    })
+
+    ipcMain.on(requestCurrentAppVersion, async (event) => {
+        event.reply(responseCurrentAppVersion, app.getVersion())
     })
 }

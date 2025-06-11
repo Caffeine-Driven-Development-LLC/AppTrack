@@ -1,7 +1,7 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import {
-    requestCheckForUpdates, requestUpdateApplication,
-    requestUpdateState,
+    requestCheckForUpdates, requestCurrentAppVersion, requestUpdateApplication,
+    requestUpdateState, responseCurrentAppVersion,
     responseUpdateState,
     updateStateChanged,
 } from '../../shared/update-ipc-channels.js'
@@ -14,15 +14,20 @@ export default function () {
         getUpdateState: () => ipcRenderer.send(requestUpdateState),
         onGetUpdateState: (callback) => ipcRenderer.on(responseUpdateState, callback),
 
+        getCurrentAppVersion: () => ipcRenderer.send(requestCurrentAppVersion),
+        onGetCurrentAppVersion: (callback) => ipcRenderer.on(responseCurrentAppVersion, callback),
+
         requestUpdateApplication: () => ipcRenderer.send(requestUpdateApplication),
 
         removeListeners: () => {
             ipcRenderer.removeAllListeners(updateStateChanged)
+            ipcRenderer.removeAllListeners(responseCurrentAppVersion)
             ipcRenderer.removeAllListeners(responseUpdateState)
         },
 
         removeListener: (callback) => {
             ipcRenderer.removeListener(updateStateChanged, callback)
+            ipcRenderer.removeListener(responseCurrentAppVersion, callback)
             ipcRenderer.removeListener(responseUpdateState, callback)
         }
     })

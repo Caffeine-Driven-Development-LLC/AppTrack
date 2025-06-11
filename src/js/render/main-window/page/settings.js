@@ -26,19 +26,37 @@ export default function () {
     const [deleteConfirmationTextField, setDeleteConfirmationTextField] =
         useState('')
 
+    const [updateState, setUpdateState] = useState(null)
+    const [currentAppVersion, setCurrentAppVersion] = useState('')
+
     const { pushView } = useContext(ViewContext)
 
     const onGetSettings = (event, args) => {
         setSettings(args)
     }
 
+    const onGetUpdateState = (event, args) => {
+        setUpdateState(args)
+    }
+
+    const onGetCurrentAppVersion = (event, args) => {
+        setCurrentAppVersion(args)
+    }
+
     useEffect(() => {
         window.settingsApi.onGetSettings(onGetSettings)
-
         window.settingsApi.getSettings()
+
+        window.updateApi.onGetUpdateState(onGetUpdateState)
+        window.updateApi.onUpdateStateChange(onGetUpdateState)
+        window.updateApi.getUpdateState()
+
+        window.updateApi.onGetCurrentAppVersion(onGetCurrentAppVersion)
+        window.updateApi.getCurrentAppVersion()
 
         return () => {
             window.settingsApi.removeListener(onGetSettings)
+            window.updateApi.removeListener(onGetSettings)
         }
     }, [])
 
@@ -64,8 +82,12 @@ export default function () {
         window.settingsApi.setAutoCheckForUpdates(value)
     }
 
-    const handleManualCheckForUpdates = (event) => {
-        window.settingsApi.checkForUpdates()
+    const handleManualCheckForUpdates = () => {
+        window.updateApi.checkForUpdates()
+    }
+
+    const handleUpdateNow = () => {
+        window.updateApi.requestUpdateApplication()
     }
 
     const handleConfigureApplicationEventsButton = (event) => {
@@ -107,6 +129,38 @@ export default function () {
         handleModalClose()
     }
 
+    const updateButton = () => {
+        if (!updateState) {
+            return <></>
+        }
+        if (updateState.checkingForUpdate) {
+            return <Typography>Checking for updates...</Typography>
+        } else if (updateState.updateAvailable) {
+            return <Typography>Downloading update...</Typography>
+        } else if (updateState.updateDownloaded) {
+            return <Stack direction="row" spacing={2}>
+                <Typography>Update is ready to install</Typography>
+                <Button
+                    size="small"
+                    variant="contained"
+                    onClick={handleUpdateNow}
+                >
+                    Restart & Update
+                </Button>
+                </Stack>
+        } else if (!settings.autoCheckForUpdates) {
+            return <Button
+                size="small"
+                variant="contained"
+                onClick={handleManualCheckForUpdates}
+            >
+                Check for updates
+            </Button>
+        } else {
+            return <></>
+        }
+    }
+
     if (!settings) return <div>Loading...</div>
 
     return (
@@ -116,7 +170,7 @@ export default function () {
             </Typography>
             <Stack spacing={2} alignItems="flex-start" sx={{ paddingLeft: 2 }}>
                 <FormControl>
-                    <Stack direction="row">
+                    <Stack direction="column" alignItems="flex-start" spacing={1}>
                         <FormControlLabel
                             control={
                                 <Switch
@@ -127,17 +181,14 @@ export default function () {
                             }
                             label="Automatically check for updates"
                         />
-                        {!settings.autoCheckForUpdates && (
-                            <Button
-                                size="small"
-                                variant="contained"
-                                onClick={handleManualCheckForUpdates}
-                            >
-                                Check for updates
-                            </Button>
-                        )}
+                        {updateButton()}
                     </Stack>
                 </FormControl>
+            </Stack>
+            <Typography variant="h6" style={{ textDecoration: 'underline' }}>
+                Theme
+            </Typography>
+            <Stack spacing={2} alignItems="flex-start" sx={{ paddingLeft: 2 }}>
                 <FormControl>
                     <InputLabel id="displayThemeSelectBox">
                         Appearance
@@ -217,6 +268,8 @@ export default function () {
                         Delete All Data
                     </Button>
                 </Stack>
+
+                <Typography variant='body2'>Version: {currentAppVersion}</Typography>
             </Stack>
             <Modal
                 isOpen={showDeleteApplicationDataModal}

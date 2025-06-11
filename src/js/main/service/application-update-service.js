@@ -1,4 +1,4 @@
-import { autoUpdater, app } from 'electron'
+import { autoUpdater, app, BrowserWindow } from 'electron'
 import { autoCheckForUpdates } from './setting-service.js'
 import logger from '../logger.js'
 
@@ -9,6 +9,12 @@ const server = 'https://update.electronjs.org'
 const feed = `${server}/Caffeine-Driven-Development-LLC/AppTrack/${process.platform}-${process.arch}/${app.getVersion()}`
 autoUpdater.setFeedURL({ url: feed })
 
+let updateState = {
+    checkingForUpdate: false,
+    updateAvailable: false,
+    updateDownloaded: false,
+};
+
 export const initializeAutoUpdate = () => {
     logger.debug('Initializing auto update...')
 
@@ -18,6 +24,11 @@ export const initializeAutoUpdate = () => {
 }
 
 export const checkForUpdate = () => {
+    if (process.env.NODE_ENV === 'development') {
+        logger.info('Auto update is disabled in development mode')
+        return
+    }
+
     logger.debug('Checking for update...')
 
     // if last check was less then 10 minutes ago, skip this check
@@ -55,27 +66,52 @@ export const stopAutoUpdateCheck = () => {
     intervalId = null
 }
 
+export const getUpdateState = () => updateState
+
+export const updateApplication = () => {
+    logger.debug('Updating application...')
+    autoUpdater.quitAndInstall()
+}
+
 autoUpdater.on('update-available', () => {
     logger.debug('Update available')
-
-    // TODO notify the renderer process that an update is available to be downloaded
+    updateState.updateAvailable = true
+    updateState.checkingForUpdate = false
+    broadcastUpdateState()
 })
 
 autoUpdater.on('update-downloaded', () => {
     logger.debug('Update downloaded')
-
-    // TODO notify the renderer process that an update is available to be installed
-    // autoUpdater.quitAndInstall()
+    updateState.updateDownloaded = true
+    updateState.checkingForUpdate = false
+    broadcastUpdateState()
 })
 
 autoUpdater.on('error', (error) => {
     logger.error('Error checking for update', error)
+    updateState.updateAvailable = false
+    updateState.updateDownloaded = false
+    updateState.checkingForUpdate = false
+    broadcastUpdateState()
 })
 
 autoUpdater.on('checking-for-update', () => {
     logger.debug('Checking for update...')
+    updateState.checkingForUpdate = true
+    broadcastUpdateState()
 })
 
 autoUpdater.on('update-not-available', () => {
     logger.debug('Update not available')
+    updateState.updateAvailable = false
+    updateState.updateDownloaded = false
+    updateState.checkingForUpdate = false
+    broadcastUpdateState()
 })
+
+function broadcastUpdateState() {
+    logger.debug(`Broadcasting update state: ${JSON.stringify(updateState)}`)
+    BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('update-state-changed', updateState);
+    });
+}

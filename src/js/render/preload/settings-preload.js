@@ -18,8 +18,6 @@ export default function () {
         setAutoCheckForUpdates: (args) =>
             ipcRenderer.send(requestSetAutoCheckForUpdates, args),
 
-        checkForUpdates: () => ipcRenderer.send(requestCheckForUpdates),
-
         onGetSettings: (callback) => ipcRenderer.on(responseSettings, callback),
 
         deleteApplicationData: () =>

@@ -5,6 +5,7 @@ import SettingsPreload from '../preload/settings-preload.js'
 import EventFlowPreload from '../preload/event-flow-preload.js'
 import SankeyNodePreload from '../preload/sankey-node-preload.js'
 import { requestOpenUrl } from '../../shared/misclanious-ipc-channels.js'
+import { updateStateChanged } from '../../shared/update-ipc-channels.js'
 
 CompanyPreload()
 ApplicationPreload()
@@ -17,5 +18,5 @@ contextBridge.exposeInMainWorld('api', {
 })
 
 contextBridge.exposeInMainWorld('updateApi', {
-    onUpdateStateChange: (callback) => ipcRenderer.on('update-state-changed', (_event, value) => callback(value)),
+    onUpdateStateChange: (callback) => ipcRenderer.on(updateStateChanged, (_event, value) => callback(value)),
 })

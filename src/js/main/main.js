@@ -5,6 +5,7 @@ import registerCompanyIpcActions from './ipc-actions/company-ipc-actions.js'
 import registerApplicationIpcActions from './ipc-actions/application-ipc-actions.js'
 import registerEventFlowIpcActions from './ipc-actions/event-flow-ipc-actions.js'
 import registerSankeyNodeIpcActions from './ipc-actions/sankey-node-ipc-actions.js'
+import { registerUpdateIpcActions, registerUpdateIpcActionsForWindow } from './ipc-actions/update-ipc-actions.js'
 import { getSettings, initializeSettings } from './service/setting-service.js'
 import { setDatabaseConnection } from './database-client.js'
 import { requestOpenUrl } from '../shared/misclanious-ipc-channels.js'
@@ -14,7 +15,7 @@ import {
     registerMediaActions,
     registerMediaProtocol,
 } from './protocol/media-protocol.js'
-import { getUpdateState, initializeAutoUpdate } from './service/application-update-service.js'
+import { initializeAutoUpdate } from './service/application-update-service.js'
 
 if (isFirstRun) {
     app.quit()
@@ -50,9 +51,7 @@ const createWindow = () => {
         mainWindow.webContents.openDevTools()
     }
 
-    mainWindow.webContents.once('did-finish-load', () => {
-        mainWindow.webContents.send('update-state-changed', getUpdateState() );
-    })
+    registerUpdateIpcActionsForWindow(mainWindow)
 }
 
 app.whenReady()
@@ -64,6 +63,7 @@ app.whenReady()
         registerCompanyIpcActions(ipcMain)
         registerEventFlowIpcActions(ipcMain)
         registerSankeyNodeIpcActions(ipcMain)
+        registerUpdateIpcActions(ipcMain)
 
         registerMediaActions()
 

@@ -142,11 +142,7 @@ export default function () {
         if (!updateState) {
             return <></>
         }
-        if (updateState.checkingForUpdate) {
-            return <Typography>Checking for updates...</Typography>
-        } else if (updateState.updateAvailable) {
-            return <Typography>Downloading update...</Typography>
-        } else if (updateState.updateDownloaded) {
+        if (updateState.updateDownloaded) {
             return <Stack direction="row" spacing={2}>
                 <Typography>Update is ready to install</Typography>
                 <Button
@@ -157,6 +153,10 @@ export default function () {
                     Restart & Update
                 </Button>
                 </Stack>
+        } else if (updateState.updateAvailable) {
+            return <Typography>Downloading update...</Typography>
+        } else if (updateState.checkingForUpdate) {
+            return <Typography>Checking for updates...</Typography>
         } else if (!settings.autoCheckForUpdates) {
             return <Button
                 size="small"

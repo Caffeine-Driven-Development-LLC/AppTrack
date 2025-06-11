@@ -10,9 +10,8 @@ INSERT INTO sankeyNodes (id, name, color) VALUES (9, 'Withdrawn', '#04399b');
 
 INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (3, 1);
 INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (4, 3);
-INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (5, 5);
-INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (5, 9);
-INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (6, 11);
-INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (7, 13);
-INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (8, 14);
-INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (9, 15);
+INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (5, 6);
+INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (6, 8);
+INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (7, 10);
+INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (8, 11);
+INSERT INTO sankeyLinks (sankeyNodeId, applicationStateId) VALUES (9, 12);

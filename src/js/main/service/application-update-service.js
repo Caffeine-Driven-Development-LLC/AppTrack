@@ -1,6 +1,7 @@
 import { autoUpdater, app, BrowserWindow } from 'electron'
 import { autoCheckForUpdates } from './setting-service.js'
 import logger from '../logger.js'
+import { updateStateChanged } from '../../shared/update-ipc-channels.js'
 
 let intervalId = null
 let lastCheckDateTime = null
@@ -112,6 +113,6 @@ autoUpdater.on('update-not-available', () => {
 function broadcastUpdateState() {
     logger.debug(`Broadcasting update state: ${JSON.stringify(updateState)}`)
     BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('update-state-changed', updateState);
+        window.webContents.send(updateStateChanged, updateState);
     });
 }

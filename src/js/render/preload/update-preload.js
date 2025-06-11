@@ -8,7 +8,7 @@ import {
 
 export default function () {
     contextBridge.exposeInMainWorld('updateApi', {
-        onUpdateStateChange: (callback) => ipcRenderer.on(updateStateChanged, (_event, value) => callback(value)),
+        onUpdateStateChange: (callback) => ipcRenderer.on(updateStateChanged, (event, value) => callback(event, value)),
         checkForUpdates: () => ipcRenderer.send(requestCheckForUpdates),
 
         getUpdateState: () => ipcRenderer.send(requestUpdateState),

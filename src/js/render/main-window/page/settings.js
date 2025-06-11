@@ -31,32 +31,29 @@ export default function () {
 
     const { pushView } = useContext(ViewContext)
 
-    const onGetSettings = (event, args) => {
-        setSettings(args)
-    }
-
-    const onGetUpdateState = (event, args) => {
-        setUpdateState(args)
-    }
-
-    const onGetCurrentAppVersion = (event, args) => {
-        setCurrentAppVersion(args)
-    }
-
     useEffect(() => {
-        window.settingsApi.onGetSettings(onGetSettings)
+        window.settingsApi.onGetSettings((event, args) => {
+            setSettings(args)
+        })
         window.settingsApi.getSettings()
 
-        window.updateApi.onGetUpdateState(onGetUpdateState)
-        window.updateApi.onUpdateStateChange(onGetUpdateState)
+        window.updateApi.onGetUpdateState((event, args) => {
+            setUpdateState(args)
+        })
+        window.updateApi.onUpdateStateChange((event, args) => {
+            setUpdateState(args)
+        })
         window.updateApi.getUpdateState()
 
-        window.updateApi.onGetCurrentAppVersion(onGetCurrentAppVersion)
+        window.updateApi.onGetCurrentAppVersion((event, args) => {
+            setCurrentAppVersion(args)
+        })
         window.updateApi.getCurrentAppVersion()
 
         return () => {
             window.settingsApi.removeListener(onGetSettings)
             window.updateApi.removeListener(onGetSettings)
+            window.updateApi.removeListener(onGetCurrentAppVersion)
         }
     }, [])
 

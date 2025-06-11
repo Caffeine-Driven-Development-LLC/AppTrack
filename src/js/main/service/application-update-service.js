@@ -68,6 +68,11 @@ export const stopAutoUpdateCheck = () => {
 
 export const getUpdateState = () => updateState
 
+export const updateApplication = () => {
+    logger.debug('Updating application...')
+    autoUpdater.quitAndInstall()
+}
+
 autoUpdater.on('update-available', () => {
     logger.debug('Update available')
     updateState.updateAvailable = true

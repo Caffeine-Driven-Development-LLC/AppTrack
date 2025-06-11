@@ -34,18 +34,21 @@ export default function () {
         setSettings(args)
     }
 
+    const onGetUpdateState = (event, args) => {
+        setUpdateState(args)
+    }
+
     useEffect(() => {
         window.settingsApi.onGetSettings(onGetSettings)
-
         window.settingsApi.getSettings()
 
-
-        window.updateApi.onUpdateStateChange((value) => {
-            setUpdateState(value)
-        });
+        window.updateApi.onGetUpdateState(onGetUpdateState)
+        window.updateApi.onUpdateStateChange(onGetUpdateState);
+        window.updateApi.getUpdateState();
 
         return () => {
             window.settingsApi.removeListener(onGetSettings)
+            window.updateApi.removeListener(onGetSettings)
         }
     }, [])
 
@@ -71,8 +74,12 @@ export default function () {
         window.settingsApi.setAutoCheckForUpdates(value)
     }
 
-    const handleManualCheckForUpdates = (event) => {
-        window.settingsApi.checkForUpdates()
+    const handleManualCheckForUpdates = () => {
+        window.updateApi.checkForUpdates()
+    }
+
+    const handleUpdateNow = () => {
+        window.updateApi.requestUpdateApplication()
     }
 
     const handleConfigureApplicationEventsButton = (event) => {
@@ -114,6 +121,38 @@ export default function () {
         handleModalClose()
     }
 
+    const updateButton = () => {
+        if (!updateState) {
+            return <></>
+        }
+        if (updateState.checkingForUpdate) {
+            return <Typography>Checking for updates...</Typography>
+        } else if (updateState.updateAvailable) {
+            return <Typography>Downloading update...</Typography>
+        } else if (updateState.updateDownloaded) {
+            return <Stack direction="row" spacing={2}>
+                <Typography>Update is ready to install</Typography>
+                <Button
+                    size="small"
+                    variant="contained"
+                    onClick={handleUpdateNow}
+                >
+                    Restart & Update
+                </Button>
+                </Stack>
+        } else if (!settings.autoCheckForUpdates) {
+            return <Button
+                size="small"
+                variant="contained"
+                onClick={handleManualCheckForUpdates}
+            >
+                Check for updates
+            </Button>
+        } else {
+            return <></>
+        }
+    }
+
     if (!settings) return <div>Loading...</div>
 
     return (
@@ -123,7 +162,7 @@ export default function () {
             </Typography>
             <Stack spacing={2} alignItems="flex-start" sx={{ paddingLeft: 2 }}>
                 <FormControl>
-                    <Stack direction="row">
+                    <Stack direction="column" alignItems="flex-start" spacing={1}>
                         <FormControlLabel
                             control={
                                 <Switch
@@ -134,18 +173,14 @@ export default function () {
                             }
                             label="Automatically check for updates"
                         />
-                        {!settings.autoCheckForUpdates && (
-                            <Button
-                                size="small"
-                                variant="contained"
-                                onClick={handleManualCheckForUpdates}
-                            >
-                                Check for updates
-                            </Button>
-                        )}
+                        {updateButton()}
                     </Stack>
                 </FormControl>
-                <Typography>{JSON.stringify(updateState)}</Typography>
+            </Stack>
+            <Typography variant="h6" style={{ textDecoration: 'underline' }}>
+                Theme
+            </Typography>
+            <Stack spacing={2} alignItems="flex-start" sx={{ paddingLeft: 2 }}>
                 <FormControl>
                     <InputLabel id="displayThemeSelectBox">
                         Appearance

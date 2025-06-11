@@ -15,7 +15,7 @@ export const registerMediaProtocol = () => {
 
 export const registerMediaActions = () => {
     protocol.handle('media', (request) => {
-        logger.info(`Requesting media: ${request.url}`)
+        logger.debug(`Requesting media: ${request.url}`)
         const filePath = request.url.slice('media://'.length).split('?')[0]
         return getMediaByPath(filePath)
     })

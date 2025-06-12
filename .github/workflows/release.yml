@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest ]
+        os: [ macos-latest, windows-latest ]
 
     steps:
       - name: Checkout repository
@@ -26,11 +26,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Decode signing certificate
+      - name: Decode signing certificate (macOS)
+        if: runner.os == 'macOS'
         run: |
           echo "${{ secrets.MAC_CERT_P12 }}" | base64 -d > signing_cert.p12
 
-      - name: Setup macOS keychain
+      - name: Setup macOS keychain (macOS)
+        if: runner.os == 'macOS'
         run: |
           security create-keychain -p temp build.keychain
           security default-keychain -s build.keychain
@@ -38,7 +40,8 @@ jobs:
           security import signing_cert.p12 -k build.keychain -P "${{ secrets.MAC_CERT_P12_PASSWORD }}" -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k temp build.keychain
 
-      - name: Build and Package App
+      - name: Build and Package App (macOS)
+        if: runner.os == 'macOS'
         env:
           CSC_KEYCHAIN: build.keychain
           CSC_LINK: signing_cert.p12
@@ -49,6 +52,10 @@ jobs:
           SIGN_IDENTITY: ${{ secrets.SIGN_IDENTITY }}
         run: npm run make
 
+      - name: Build and Package App (Windows)
+        if: runner.os == 'Windows'
+        run: npm run make
+
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4.6.0
         with:
@@ -56,9 +63,19 @@ jobs:
           path: | 
             out/make/*
 
-      - name: Create GitHub Release
+      - name: Create GitHub Release (macOS)
+        if: runner.os == 'macOS'
         uses: softprops/action-gh-release@v1
         with:
           files: |
             out/make/*.dmg
             out/make/zip/darwin/arm64/*.zip
+
+      - name: Create GitHub Release (Windows)
+        if: runner.os == 'Windows'
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            out/make/squirrel.windows/x64/*.exe
+            out/make/squirrel.windows/x64/*.nupkg
+            out/make/squirrel.windows/x64/RELEASES

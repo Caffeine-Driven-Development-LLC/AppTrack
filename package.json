@@ -1,5 +1,6 @@
 {
   "name": "apptrack",
+  "productName": "App Track",
   "description": "App Track! A desktop application to help track your job applications",
   "license": "GPL-3.0-only",
   "main": "./.webpack/main",
@@ -15,7 +16,7 @@
   },
   "author": {
     "name": "Ian McNaughton",
-    "email": "Ian@caffeine-driven-development.com"
+    "email": "IanMcNaugh@gmail.com"
   },
   "devDependencies": {
     "@babel/core": "^7.23.3",

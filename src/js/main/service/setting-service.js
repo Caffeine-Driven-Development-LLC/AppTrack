@@ -88,13 +88,14 @@ export function deleteApplicationData() {
     })
 }
 
-export async function deleteAllData() {
-    await closeDatabaseConnection()
+export function deleteAllData() {
+    closeDatabaseConnection()
         .then(() => fs.unlinkSync(settings.databasePath))
         .then(() => fs.unlinkSync(getSettingsFilePath()))
         .then(() => fs.unlinkSync(logFilePath))
         .then(() => fs.rm(getMediaFolderPath(), {recursive: true, force: true}))
-
-    app.relaunch()
-    app.exit()
+        .then(() => {
+            app.relaunch()
+            app.exit(0)
+        })
 }

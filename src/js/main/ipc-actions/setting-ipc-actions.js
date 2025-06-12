@@ -41,7 +41,7 @@ export default function (ipcMain) {
         deleteApplicationData()
     })
 
-    ipcMain.on(requestDeleteAllData, async () => {
-        await deleteAllData()
+    ipcMain.on(requestDeleteAllData, () => {
+        deleteAllData()
     })
 }

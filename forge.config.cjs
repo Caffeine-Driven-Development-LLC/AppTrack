@@ -29,7 +29,12 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-squirrel',
-      config: {}
+      config: {
+        name: 'AppTrack',
+        authors: 'Caffeine Driven Development',
+        description: 'App Track! A desktop application to help track your job applications',
+        iconUrl: 'https://raw.githubusercontent.com/Caffeine-Driven-Development-LLC/AppTrack/refs/heads/main/img/icon.ico',
+      }
     }
   ],
   plugins: [

@@ -71,15 +71,16 @@ export async function getApplicationById(id) {
  */
 export async function updateApplication(id, applicationInput) {
     if (!id) throw new Error('Application Id is required')
+
     return validateAndSanitizeUpdateApplicationInput(applicationInput)
-        .then((sanitizedInput) => (applicationInput = sanitizedInput))
-        .then((applicationInput) =>
+        // .then((sanitizedInput) => (applicationInput = sanitizedInput))
+        .then((sanitizedInput) =>
             updateApplicationInDb(id, {
-                companyId: applicationInput.companyId,
-                role: applicationInput.role,
-                postUrl: applicationInput.postUrl,
-                salaryRangeHigh: applicationInput.salaryRangeHigh,
-                salaryRangeLow: applicationInput.salaryRangeLow,
+                companyId: sanitizedInput.companyId,
+                role: sanitizedInput.role,
+                postUrl: sanitizedInput.postUrl,
+                salaryRangeHigh: sanitizedInput.salaryRangeHigh,
+                salaryRangeLow: sanitizedInput.salaryRangeLow,
             })
         )
         .then(() => getApplicationById(id))

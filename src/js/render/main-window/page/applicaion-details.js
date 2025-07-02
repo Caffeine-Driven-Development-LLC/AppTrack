@@ -72,9 +72,9 @@ export default function ({ initialApplication }) {
             }
         })
 
-        window.applicationApi.onGetApplication((event, application) => {
-            if (application.id === application.id) {
-                setApplication(application)
+        window.applicationApi.onGetApplication((event, app) => {
+            if (app.id === initialApplication.id) {
+                setApplication(app)
             }
         })
 

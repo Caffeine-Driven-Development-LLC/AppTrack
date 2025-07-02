@@ -73,7 +73,6 @@ export async function updateApplication(id, applicationInput) {
     if (!id) throw new Error('Application Id is required')
 
     return validateAndSanitizeUpdateApplicationInput(applicationInput)
-        // .then((sanitizedInput) => (applicationInput = sanitizedInput))
         .then((sanitizedInput) =>
             updateApplicationInDb(id, {
                 companyId: sanitizedInput.companyId,

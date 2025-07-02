@@ -96,8 +96,6 @@ export default function CompanyInputEdit({
         setHasLogoChanged(true)
     }
 
-    useEffect(() => {}, [])
-
     return (
         <form onSubmit={handleSubmit}>
             <Stack spacing={2} sx={{ width: '300px' }}>

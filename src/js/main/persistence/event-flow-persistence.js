@@ -21,6 +21,14 @@ export async function swapDisplayOrderOfApplicationStates(
     ])
 }
 
+export async function reorderApplicationStates(reorderData) {
+    const db = getDatabaseConnection()
+    const updatePromises = reorderData.map(({ id, displayOrder }) =>
+        db.run(updateDisplayOrderSql, [displayOrder, id])
+    )
+    return Promise.all(updatePromises)
+}
+
 export async function insertApplicationState(applicationStateInput) {
     await getDatabaseConnection().run(insertApplicationStateSql, [
         applicationStateInput.name,
@@ -114,3 +122,5 @@ SET displayOrder = CASE
     ELSE displayOrder
 END
 WHERE id IN (?, ?)`
+
+const updateDisplayOrderSql = `UPDATE applicationStates SET displayOrder = ? WHERE id = ?`

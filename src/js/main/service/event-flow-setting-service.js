@@ -2,6 +2,7 @@ import {
     deleteApplicationState as deleteApplicationStateFromDb,
     insertApplicationFlow,
     insertApplicationState,
+    reorderApplicationStates as reorderInDb,
     removeApplicationStateFromFlowById,
     removeApplicationStateFromFlowByNextStepId,
     selectApplicationStates,
@@ -117,6 +118,15 @@ export async function swapOrderOfApplicationStates(args) {
         args.displayOrder1,
         args.displayOrder2
     ).then(() => getEventFlowMap())
+}
+
+/**
+ * Reorder multiple application states at once
+ * @param reorderData array of {id, displayOrder} objects
+ * @returns {Promise<[Object]>} A list of application states with available next steps
+ */
+export async function reorderApplicationStates(reorderData) {
+    return reorderInDb(reorderData).then(() => getEventFlowMap())
 }
 
 function processApplicationStates(applicationStates) {

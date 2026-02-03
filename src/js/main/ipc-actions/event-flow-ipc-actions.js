@@ -2,6 +2,7 @@ import {
     createApplicationState,
     deleteApplicationState,
     getEventFlowMap,
+    reorderApplicationStates,
     swapOrderOfApplicationStates,
     updateApplicationState,
 } from '../service/event-flow-setting-service.js'
@@ -9,6 +10,7 @@ import {
     requestCreateApplicationState,
     requestDeleteApplicationState,
     requestEventFlowMap,
+    requestReorderApplicationStates,
     requestSwapOrderOfApplicationStates,
     requestUpdateApplicationState,
     responseEventFlowMap,
@@ -39,6 +41,19 @@ export default function (ipcMain) {
             .catch((error) => {
                 logger.error(
                     `Error swapping order of application states: ${error.message}`
+                )
+            })
+    })
+
+    ipcMain.on(requestReorderApplicationStates, async (event, args) => {
+        logger.debug('Reordering application states')
+        reorderApplicationStates(args)
+            .then((eventFlowMap) => {
+                event.reply(responseEventFlowMap, eventFlowMap)
+            })
+            .catch((error) => {
+                logger.error(
+                    `Error reordering application states: ${error.message}`
                 )
             })
     })

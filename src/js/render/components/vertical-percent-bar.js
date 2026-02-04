@@ -1,8 +1,7 @@
-import { Tooltip, useTheme } from '@mui/material'
+import { Tooltip } from '../ui/index.js'
 
-export default function ({ fillPercentage }) {
-    const theme = useTheme()
-    const isDarkTheme = theme.palette.mode === 'dark'
+export default function VerticalPercentBar({ fillPercentage }) {
+    const isDarkTheme = document.documentElement.classList.contains('dark')
 
     const earlyFillHex = isDarkTheme
         ? 'rgba(45,148,36, 0.6)'
@@ -24,15 +23,15 @@ export default function ({ fillPercentage }) {
 
     const barStyle = {
         width: '10px',
-        background: `linear-gradient(to bottom, 
-    ${fillHex} ${fillPercentage}%, 
+        background: `linear-gradient(to bottom,
+    ${fillHex} ${fillPercentage}%,
     ${notFillHex} ${fillPercentage}%)`,
     }
 
     const toolTipText = `${parseInt(fillPercentage)}% to ghosted`
 
     return (
-        <Tooltip title={toolTipText}>
+        <Tooltip content={toolTipText}>
             <div style={barStyle}></div>
         </Tooltip>
     )

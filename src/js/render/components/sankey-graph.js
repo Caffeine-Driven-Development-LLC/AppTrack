@@ -1,16 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { useTheme } from '@mui/material'
 import { Chart, LinearScale, Tooltip } from 'chart.js'
 import { Flow, SankeyController } from 'chartjs-chart-sankey'
 
 Chart.register(SankeyController, Flow, LinearScale, Tooltip)
 
-export default function ({ data, height }) {
+export default function SankeyGraph({ data, height }) {
     const [chart, setChart] = useState(null)
     const svgRef = useRef()
 
-    const theme = useTheme()
-    const isDarkTheme = theme.palette.mode === 'dark'
+    const isDarkTheme = document.documentElement.classList.contains('dark')
+    const textColor = isDarkTheme ? '#f8f8f8' : '#1e1e1e'
 
     const defaultColor = '#6abaaa'
 
@@ -48,7 +47,7 @@ export default function ({ data, height }) {
                         colorMode: 'gradient',
                         borderWidth: 1,
                         borderColor: 'black',
-                        color: theme.palette.text.primary,
+                        color: textColor,
                     },
                 ],
             },
@@ -82,7 +81,7 @@ export default function ({ data, height }) {
         chart?.destroy()
         setChart(null)
         setChart(drawChart())
-    }, [theme.palette.mode, isDarkTheme, data])
+    }, [isDarkTheme, data])
 
     return (
         <canvas

@@ -1,34 +1,29 @@
-import { Link, Stack, Typography } from '@mui/material'
 import { parseDateToLocalString } from '../utils/date-utils.js'
 
-export default function ({ date, header, comment, handleEditClick }) {
+export default function TimelineEvent({ date, header, comment, handleEditClick }) {
     return (
-        <Stack>
-            <Stack direction="row" spacing={1} alignItems="center">
-                <Typography variant="body2">
+        <div className="flex flex-col">
+            <div className="flex items-center gap-2">
+                <span className="text-sm text-[var(--text-secondary)]">
                     {parseDateToLocalString(date)}
-                </Typography>
-                <Typography variant="h6">{header}</Typography>
-            </Stack>
+                </span>
+                <span className="text-lg font-semibold text-[var(--text-primary)]">
+                    {header}
+                </span>
+            </div>
             {comment && (
-                <Typography variant="body2" sx={{ paddingBottom: '4px' }}>
-                    {comment.split('\n').map((line, index) => (
-                        <span key={index}>
-                            {line}
-                            <br />
-                        </span>
-                    ))}
-                </Typography>
+                <p className="text-sm text-[var(--text-secondary)] pb-1 whitespace-pre-wrap">
+                    {comment}
+                </p>
             )}
             {handleEditClick && (
-                <Link
-                    underline="hover"
-                    sx={{ fontSize: '12px', width: 'fit-content' }}
+                <button
                     onClick={handleEditClick}
+                    className="text-xs text-accent-500 hover:underline w-fit"
                 >
                     Edit
-                </Link>
+                </button>
             )}
-        </Stack>
+        </div>
     )
 }

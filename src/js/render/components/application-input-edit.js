@@ -1,33 +1,30 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { getCurrentDateString } from '../utils/date-utils.js'
+import { EventFlowContext } from '../main-window/event-flow-context.js'
+import { ViewContext } from '../main-window/view-context.js'
 import {
     Autocomplete,
     Button,
+    DatePicker,
     Dialog,
-    DialogActions,
     DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Stack,
-    TextField,
-} from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers'
-import dayjs from 'dayjs'
-import { EventFlowContext } from '../main-window/event-flow-context.js'
-import { ViewContext } from '../main-window/view-context.js'
+    DialogClose,
+    Input,
+    TextArea,
+    Select,
+    SelectItem,
+} from '../ui/index.js'
 
-export default function ({ onClose: onClose, application: application }) {
+export default function ApplicationInputEdit({ onClose, application }) {
     const { eventFlowMap } = useContext(EventFlowContext)
 
     const [initialEvents] = useState(
         eventFlowMap
             .filter((e) => e.initialStep === 1 && e.isDeleted === 0)
-            .map((e) => {
-                return {
-                    id: e.id,
-                    label: e.name,
-                }
-            })
+            .map((e) => ({
+                id: e.id,
+                label: e.name,
+            }))
     )
 
     const [applicationInput, setApplicationInput] = useState(
@@ -38,19 +35,12 @@ export default function ({ onClose: onClose, application: application }) {
             notes: '',
             salaryRangeHigh: undefined,
             salaryRangeLow: undefined,
-            initialEventId: initialEvents[0].id || undefined,
+            initialEventId: initialEvents[0]?.id || undefined,
             dateApplied: getCurrentDateString(),
         }
     )
-    const [companyAutoCompleteInputValue, setCompanyAutoCompleteInputValue] =
-        useState((applicationInput && applicationInput.companyId) || '')
+
     const [companyOptions, setCompanyOptions] = useState([])
-
-    const [
-        initialEventAutoCompleteInputValue,
-        setInitialEventAutoCompleteInputValue,
-    ] = useState(initialEvents[0].label || '')
-
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
     const [dateError, setDateError] = useState(false)
 
@@ -58,12 +48,10 @@ export default function ({ onClose: onClose, application: application }) {
 
     useEffect(() => {
         window.companyApi.onGetCompanyNames((event, companies) => {
-            const companyMap = companies.map((c) => {
-                return {
-                    id: c.id,
-                    label: c.name,
-                }
-            })
+            const companyMap = companies.map((c) => ({
+                id: c.id,
+                label: c.name,
+            }))
             setCompanyOptions(companyMap)
         })
         window.companyApi.getCompanyNames()
@@ -103,188 +91,145 @@ export default function ({ onClose: onClose, application: application }) {
 
             window.applicationApi.createApplication(applicationInput)
         }
-        onClose()
+        onClose?.()
     }
 
     const handleCancel = () => {
-        onClose()
+        onClose?.()
     }
 
     const handleDelete = () => {
         window.applicationApi.deleteApplication(applicationInput.id)
         setIsDeleteDialogOpen(false)
         setViewHistory((prevState) => prevState.slice(0, -1))
-        onClose()
+        onClose?.()
     }
+
+    const selectedCompany = companyOptions.find((c) => c.id === applicationInput.companyId)
 
     return (
         <form onSubmit={handleSubmit}>
-            <Stack spacing={2}>
+            <div className="flex flex-col gap-4 min-w-[400px]">
                 <Autocomplete
-                    size="small"
-                    required
-                    disableClearable
-                    id="companyId"
-                    renderInput={(params) => (
-                        <TextField {...params} required label="Company" />
-                    )}
-                    options={companyOptions}
-                    value={
-                        companyOptions.find(
-                            (c) => c.id === applicationInput.companyId
-                        ) || null
-                    }
-                    onChange={(event, newValue) => {
+                    label="Company"
+                    value={selectedCompany}
+                    onChange={(option) => {
                         handleChange({
-                            target: { id: 'companyId', value: newValue.id },
+                            target: { id: 'companyId', value: option?.id || '' },
                         })
                     }}
-                    inputValue={companyAutoCompleteInputValue}
-                    onInputChange={(event, newInputValue) => {
-                        setCompanyAutoCompleteInputValue(newInputValue)
-                    }}
+                    options={companyOptions}
+                    getOptionLabel={(opt) => opt?.label || ''}
+                    placeholder="Select a company..."
                 />
-                {!applicationInput.id && initialEvents.length !== 1 && (
-                    <Autocomplete
-                        size="small"
-                        required
-                        disableClearable
-                        id="initialEventId"
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                required
-                                label="Initial Event"
-                            />
-                        )}
-                        options={initialEvents}
-                        value={initialEvents.find(
-                            (e) => e.id === applicationInput.initialEventId
-                        )}
-                        onChange={(event, newValue) => {
+
+                {!applicationInput.id && initialEvents.length > 1 && (
+                    <Select
+                        label="Initial Event"
+                        value={String(applicationInput.initialEventId)}
+                        onValueChange={(value) => {
                             handleChange({
-                                target: {
-                                    id: 'initialEventId',
-                                    value: newValue.id,
-                                },
+                                target: { id: 'initialEventId', value: parseInt(value) },
                             })
                         }}
-                        inputValue={initialEventAutoCompleteInputValue}
-                        onInputChange={(event, newInputValue) =>
-                            setInitialEventAutoCompleteInputValue(newInputValue)
-                        }
-                    />
+                    >
+                        {initialEvents.map((event) => (
+                            <SelectItem key={event.id} value={String(event.id)}>
+                                {event.label}
+                            </SelectItem>
+                        ))}
+                    </Select>
                 )}
+
                 {!applicationInput.id && (
                     <DatePicker
                         label="Date Applied"
-                        defaultValue={dayjs()}
-                        onChange={(date) =>
+                        value={applicationInput.dateApplied}
+                        onChange={(value) =>
                             handleChange({
-                                target: {
-                                    id: 'dateApplied',
-                                    value: date?.format('YYYY-MM-DD'),
-                                },
+                                target: { id: 'dateApplied', value },
                             })
                         }
-                        slotProps={{
-                            textField: {
-                                size: 'small',
-                                required: true,
-                            },
-                        }}
-                        renderInput={(params) => (
-                            <TextField {...params} required error={dateError} />
-                        )}
+                        required
+                        error={dateError}
                     />
                 )}
-                <TextField
-                    required
-                    size="small"
+
+                <Input
                     id="role"
                     label="Role"
-                    variant="outlined"
                     value={applicationInput.role}
                     onChange={handleChange}
+                    required
                 />
-                <Stack direction="row" spacing={2}>
-                    <TextField
-                        size="small"
+
+                <div className="grid grid-cols-2 gap-4">
+                    <Input
                         id="salaryRangeLow"
                         label="Salary Range (Low)"
                         type="number"
-                        variant="outlined"
                         value={applicationInput.salaryRangeLow || ''}
                         onChange={handleChange}
                     />
-                    <TextField
-                        size="small"
+                    <Input
                         id="salaryRangeHigh"
                         label="Salary Range (High)"
                         type="number"
-                        variant="outlined"
                         value={applicationInput.salaryRangeHigh || ''}
                         onChange={handleChange}
                     />
-                </Stack>
-                <TextField
-                    size="small"
+                </div>
+
+                <Input
                     id="postUrl"
                     label="URL"
-                    variant="outlined"
                     value={applicationInput.postUrl || ''}
                     onChange={handleChange}
                 />
+
                 {!applicationInput.id && (
-                    <TextField
-                        size="small"
+                    <TextArea
                         id="notes"
                         label="Notes"
-                        variant="outlined"
                         value={applicationInput.notes || ''}
                         onChange={handleChange}
-                        multiline
                         rows={2}
                     />
                 )}
-                <Stack direction="row-reverse" spacing={2}>
-                    <Button
-                        variant="contained"
-                        type="submit"
-                        vaiant="contained"
-                    >
-                        Submit
-                    </Button>
-                    <Button variant="outlined" onClick={handleCancel}>
-                        Cancel
-                    </Button>
+
+                <div className="flex justify-end gap-2">
                     {applicationInput.id && (
-                        <Button onClick={() => setIsDeleteDialogOpen(true)}>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setIsDeleteDialogOpen(true)}
+                        >
                             Delete
                         </Button>
                     )}
-                </Stack>
-            </Stack>
-            <Dialog
-                open={isDeleteDialogOpen}
-                onClose={() => setIsDeleteDialogOpen(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    Delete Application
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to delete this application?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDelete}>Delete</Button>
-                    <Button onClick={() => setIsDeleteDialogOpen(false)}>
+                    <Button type="button" variant="secondary" onClick={handleCancel}>
                         Cancel
                     </Button>
-                </DialogActions>
+                    <Button type="submit">
+                        Submit
+                    </Button>
+                </div>
+            </div>
+
+            <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => !open && setIsDeleteDialogOpen(false)}>
+                <DialogContent title="Delete Application">
+                    <p className="text-sm text-[var(--text-secondary)] mb-4">
+                        Are you sure you want to delete this application?
+                    </p>
+                    <div className="flex justify-end gap-2">
+                        <DialogClose>
+                            <Button variant="secondary" size="sm">Cancel</Button>
+                        </DialogClose>
+                        <Button variant="danger" size="sm" onClick={handleDelete}>
+                            Delete
+                        </Button>
+                    </div>
+                </DialogContent>
             </Dialog>
         </form>
     )

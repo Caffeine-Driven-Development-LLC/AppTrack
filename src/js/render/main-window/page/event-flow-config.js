@@ -1,11 +1,10 @@
 import React from 'react'
-import { Box } from '@mui/material'
 import EventFlowList from '../../components/event-flow-list.js'
 
-export default function () {
+export default function EventFlowConfig() {
     return (
-        <Box>
-            <EventFlowList label="Applicaion Steps" />
-        </Box>
+        <div className="p-4">
+            <EventFlowList label="Application Steps" />
+        </div>
     )
 }

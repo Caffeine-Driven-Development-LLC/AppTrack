@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react'
 import SanKeyGraph from '../../components/sankey-graph.js'
-import { Stack } from '@mui/material'
-import { DatePicker } from '@mui/x-date-pickers'
+import { DatePicker } from '../../ui/index.js'
 
-export default function () {
+export default function Stats() {
     const [sankeyData, setSankeyData] = useState(null)
-    const [dateRangeInput, setDateRangeInput] = useState(
-        {
-            startDate: null,
-            endDate: null
-        }
-    )
+    const [dateRangeInput, setDateRangeInput] = useState({
+        startDate: null,
+        endDate: null
+    })
 
     useEffect(() => {
         window.api.onAllApplicationsSankeyData((event, data) => {
@@ -20,60 +17,27 @@ export default function () {
         window.api.getAllApplicationsSankeyData(dateRangeInput.startDate, dateRangeInput.endDate)
     }, [dateRangeInput])
 
-    const handleChange = (event) => {
-        let {id, value} = event.target
-        setDateRangeInput((prevState) => ({
-            ...prevState,
-                [id]: value,
-        }))
-    }
-
     return (
-        <Stack spacing={2}>
-            <Stack spacing={2} direction="row" >
+        <div className="flex flex-col gap-4">
+            <div className="flex gap-4">
                 <DatePicker
                     label="Start Date"
-                    onChange={(date) =>
-                        handleChange({
-                            target: {
-                                id: 'startDate',
-                                value: date?.format('YYYY-MM-DD')
-                            },
-                        })
+                    value={dateRangeInput.startDate}
+                    onChange={(value) =>
+                        setDateRangeInput((prev) => ({ ...prev, startDate: value }))
                     }
-                    slotProps={{
-                        textField: { size: "small" },
-                        field: {clearable: true, onClear: () => handleChange({
-                            target: {
-                                id: 'startDate',
-                                value: null
-                            },
-                        })},
-                    }}
+                    clearable
                 />
                 <DatePicker
                     label="End Date"
-                    size="small"
-                    onChange={(date) =>
-                        handleChange({
-                            target: {
-                                id: 'endDate',
-                                value: date?.format('YYYY-MM-DD')
-                            },
-                        })
+                    value={dateRangeInput.endDate}
+                    onChange={(value) =>
+                        setDateRangeInput((prev) => ({ ...prev, endDate: value }))
                     }
-                    slotProps={{
-                        textField: { size: "small" },
-                        field: {clearable: true, onClear: () => handleChange({
-                                target: {
-                                    id: 'endDate',
-                                    value: null
-                                },
-                            })},
-                    }}
+                    clearable
                 />
-            </Stack>
+            </div>
             {sankeyData && <SanKeyGraph data={sankeyData} height={300} />}
-        </Stack>
+        </div>
     )
 }

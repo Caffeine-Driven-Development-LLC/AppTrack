@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+/* Custom CSS variables for theming */
+@theme {
+  /* Surface colors - dark first design */
+  --color-surface-50: #f8f8f8;
+  --color-surface-100: #e8e8e8;
+  --color-surface-200: #d0d0d0;
+  --color-surface-300: #b0b0b0;
+  --color-surface-400: #888888;
+  --color-surface-500: #666666;
+  --color-surface-600: #484848;
+  --color-surface-700: #363636;
+  --color-surface-800: #282828;
+  --color-surface-900: #1e1e1e;
+  --color-surface-950: #141414;
+
+  /* Accent color */
+  --color-accent-50: #e6f7f7;
+  --color-accent-100: #ccefef;
+  --color-accent-200: #99dfdf;
+  --color-accent-300: #66cfcf;
+  --color-accent-400: #33bfbf;
+  --color-accent-500: #5bbbbb;
+  --color-accent-600: #4a9999;
+  --color-accent-700: #387777;
+  --color-accent-800: #265555;
+  --color-accent-900: #143333;
+
+  /* Status colors */
+  --color-positive: #4ade80;
+  --color-negative: #f87171;
+  --color-warning: #fbbf24;
+  --color-info: #60a5fa;
+
+  /* Font families */
+  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Font sizes - tighter for desktop */
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.8125rem;
+  --text-sm--line-height: 1.25rem;
+  --text-base: 0.875rem;
+  --text-base--line-height: 1.375rem;
+  --text-lg: 1rem;
+  --text-lg--line-height: 1.5rem;
+  --text-xl: 1.125rem;
+  --text-xl--line-height: 1.625rem;
+
+  /* Shadows */
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.1);
+  --shadow-elevated: 0 4px 12px 0 rgb(0 0 0 / 0.15);
+  --shadow-overlay: 0 8px 24px 0 rgb(0 0 0 / 0.25);
+}
+
+/* Base styles */
+:root {
+  --bg-primary: var(--color-surface-50);
+  --bg-secondary: var(--color-surface-100);
+  --bg-tertiary: var(--color-surface-200);
+  --text-primary: var(--color-surface-900);
+  --text-secondary: var(--color-surface-600);
+  --text-muted: var(--color-surface-400);
+  --border-color: var(--color-surface-200);
+}
+
+.dark {
+  --bg-primary: var(--color-surface-900);
+  --bg-secondary: var(--color-surface-800);
+  --bg-tertiary: var(--color-surface-700);
+  --text-primary: var(--color-surface-50);
+  --text-secondary: var(--color-surface-300);
+  --text-muted: var(--color-surface-500);
+  --border-color: var(--color-surface-700);
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove default focus outlines, add custom */
+*:focus {
+  outline: none;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--color-accent-500);
+  outline-offset: 2px;
+}

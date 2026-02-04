@@ -1,39 +1,21 @@
 import ApplicationOverview from '../../components/application-overview.js'
-import { Box, Button, Link, Stack, Typography } from '@mui/material'
 import { useContext, useEffect, useState } from 'react'
-import {
-    Timeline,
-    TimelineConnector,
-    TimelineContent,
-    TimelineDot,
-    TimelineSeparator,
-    TimelineItem,
-    timelineItemClasses,
-} from '@mui/lab'
-import Modal from '../../components/modal.js'
 import ApplicationInputEdit from '../../components/application-input-edit.js'
 import EventInputEdit from '../../components/event-input-edit.js'
 import ApplicaionNoteInputEdit from '../../components/applicaion-note-input-edit.js'
 import TimelineEvent from '../../components/timeline-event.js'
 import { EventFlowContext } from '../event-flow-context.js'
+import { Button, Dialog, DialogContent } from '../../ui/index.js'
 
-export default function ({ initialApplication }) {
+export default function ApplicationDetails({ initialApplication }) {
     const [application, setApplication] = useState(initialApplication || {})
     const [events, setEvents] = useState([])
 
     const [eventToEdit, setEventToEdit] = useState(null)
 
-    const [isApplicationInputModalOpen, setIsApplicationInputModalOpen] =
-        useState(false)
-    const [
-        isApplicationEventInputModalOpen,
-        setIsApplicationEventInputModalOpen,
-    ] = useState(false)
-
-    const [
-        isApplicationNoteInputModalOpen,
-        setIsApplicationNoteInputModalOpen,
-    ] = useState(false)
+    const [isApplicationInputModalOpen, setIsApplicationInputModalOpen] = useState(false)
+    const [isApplicationEventInputModalOpen, setIsApplicationEventInputModalOpen] = useState(false)
+    const [isApplicationNoteInputModalOpen, setIsApplicationNoteInputModalOpen] = useState(false)
 
     const { eventFlowMap } = useContext(EventFlowContext)
 
@@ -85,110 +67,97 @@ export default function ({ initialApplication }) {
         }
     }, [])
 
-    const jobDescriptionButton = application.postUrl && (
-        <Button
-            onClick={() => window.api.openLink(application.postUrl)}
-            variant="outlined"
-            size="small"
-        >
-            Job Description
-        </Button>
-    )
-
-    const salaryRange = application.salaryRangeHigh &&
-        application.salaryRangeLow && (
-            <Typography>
-                Salary Range: $
-                {Intl.NumberFormat().format(application.salaryRangeLow)} - $
-                {Intl.NumberFormat().format(application.salaryRangeHigh)}
-            </Typography>
-        )
-
     return (
-        <Box sx={{ width: '100%' }}>
-            <Stack spacing={1}>
+        <div className="w-full">
+            <div className="flex flex-col gap-4">
                 <ApplicationOverview
                     application={application}
                     eventFlowMap={eventFlowMap}
                     onApplicationStatusChange={handleApplicationStatusChange}
                 />
-                <Stack direction="row" spacing={1}>
-                    <Button
-                        variant="contained"
-                        size="small"
-                        onClick={handleAddNoteClick}
-                    >
+
+                <div className="flex items-center gap-2">
+                    <Button size="sm" onClick={handleAddNoteClick}>
                         Add Note
                     </Button>
-                    {jobDescriptionButton}
+                    {application.postUrl && (
+                        <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => window.api.openLink(application.postUrl)}
+                        >
+                            Job Description
+                        </Button>
+                    )}
                     <Button
-                        size="small"
+                        variant="ghost"
+                        size="sm"
                         onClick={() => setIsApplicationInputModalOpen(true)}
                     >
                         Edit
                     </Button>
-                </Stack>
-                {salaryRange}
-                <Timeline
-                    sx={{
-                        [`& .${timelineItemClasses.root}:before`]: {
-                            flex: 0,
-                            padding: 0,
-                        },
-                    }}
-                >
+                </div>
+
+                {application.salaryRangeHigh && application.salaryRangeLow && (
+                    <p className="text-[var(--text-primary)]">
+                        Salary Range: ${Intl.NumberFormat().format(application.salaryRangeLow)} - ${Intl.NumberFormat().format(application.salaryRangeHigh)}
+                    </p>
+                )}
+
+                {/* Timeline */}
+                <div className="flex flex-col">
                     {events.map((event, index) => (
-                        <TimelineItem key={event.id}>
-                            <TimelineSeparator>
-                                <TimelineDot />
+                        <div key={event.id} className="flex">
+                            {/* Timeline marker */}
+                            <div className="flex flex-col items-center mr-4">
+                                <div className="w-3 h-3 rounded-full bg-accent-500 flex-shrink-0" />
                                 {index !== events.length - 1 && (
-                                    <TimelineConnector />
+                                    <div className="w-0.5 flex-1 bg-[var(--border-color)] my-1" />
                                 )}
-                            </TimelineSeparator>
-                            <TimelineContent>
+                            </div>
+                            {/* Content */}
+                            <div className="pb-4 flex-1">
                                 <TimelineEvent
                                     date={event.date}
                                     header={event.status}
                                     comment={event.notes}
-                                    handleEditClick={(e) =>
-                                        handleEditEventClick(e, event)
-                                    }
+                                    handleEditClick={(e) => handleEditEventClick(e, event)}
                                 />
-                            </TimelineContent>
-                        </TimelineItem>
+                            </div>
+                        </div>
                     ))}
-                </Timeline>
-            </Stack>
-            <Modal
-                isOpen={isApplicationInputModalOpen}
-                onClose={() => setIsApplicationInputModalOpen(false)}
-                header="Edit Application"
-            >
-                <ApplicationInputEdit application={application} />
-            </Modal>
-            <Modal
-                isOpen={isApplicationEventInputModalOpen}
-                onClose={() => handleModalClose(false)}
-                header={eventToEdit ? eventToEdit.status : 'Edit Event'}
-            >
-                <EventInputEdit
-                    onclose={() => handleModalClose(false)}
-                    eventId={eventToEdit ? eventToEdit.id : null}
-                    event={eventToEdit}
-                    applicationId={application.id}
-                />
-            </Modal>
-            <Modal
-                isOpen={isApplicationNoteInputModalOpen}
-                onClose={() => handleModalClose(false)}
-                header="Note"
-            >
-                <ApplicaionNoteInputEdit
-                    applicationId={application.id}
-                    onclose={() => handleModalClose(true)}
-                    note={eventToEdit}
-                />
-            </Modal>
-        </Box>
+                </div>
+            </div>
+
+            <Dialog open={isApplicationInputModalOpen} onOpenChange={(open) => !open && setIsApplicationInputModalOpen(false)}>
+                <DialogContent title="Edit Application">
+                    <ApplicationInputEdit
+                        application={application}
+                        onClose={() => setIsApplicationInputModalOpen(false)}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isApplicationEventInputModalOpen} onOpenChange={(open) => !open && handleModalClose(false)}>
+                <DialogContent title={eventToEdit ? eventToEdit.status : 'Edit Event'}>
+                    <EventInputEdit
+                        onclose={() => handleModalClose(false)}
+                        eventId={eventToEdit ? eventToEdit.id : null}
+                        event={eventToEdit}
+                        applicationId={application.id}
+                    />
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={isApplicationNoteInputModalOpen} onOpenChange={(open) => !open && handleModalClose(false)}>
+                <DialogContent title="Note">
+                    <ApplicaionNoteInputEdit
+                        applicationId={application.id}
+                        onclose={() => handleModalClose(true)}
+                        note={eventToEdit}
+                    />
+                </DialogContent>
+            </Dialog>
+        </div>
     )
 }

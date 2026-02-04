@@ -1,6 +1,6 @@
-import { Tooltip, Typography } from '@mui/material'
+import { Tooltip } from '../ui/index.js'
 
-export default function ({ date, prefix = '' }) {
+export default function EstimatedTimeAgo({ date, prefix = '' }) {
     const now = new Date()
     const dateParts = date.split('-')
     const pastDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2])
@@ -25,8 +25,8 @@ export default function ({ date, prefix = '' }) {
     const displayedText = `${prefix} ${dayPastInLaymenTerms}`.trim()
 
     return (
-        <Tooltip title={pastDate.toDateString()}>
-            <Typography variant="body2">{displayedText}</Typography>
+        <Tooltip content={pastDate.toDateString()}>
+            <span className="text-sm text-[var(--text-secondary)]">{displayedText}</span>
         </Tooltip>
     )
 }

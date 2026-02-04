@@ -1,35 +1,25 @@
-import { Button, Menu, MenuItem, Stack, Typography } from '@mui/material'
 import Logo from './logo.js'
 import EstimatedTimeAgo from './estimated-time-ago.js'
-import { ArrowDropDown } from '@mui/icons-material'
 import VerticalPercentBar from './vertical-percent-bar.js'
 import { useContext, useEffect, useState } from 'react'
 import EventInputEdit from './event-input-edit.js'
-import Modal from './modal.js'
 import { EventFlowContext } from '../main-window/event-flow-context.js'
+import { Button, Dialog, DialogContent, Menu, MenuItem } from '../ui/index.js'
 
-export default function ({ application, onApplicationStatusChange }) {
+function ChevronDownIcon() {
+    return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 6L8 10L12 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    )
+}
+
+export default function ApplicationOverview({ application, onApplicationStatusChange }) {
     const [nextStepsMenuItems, setNextStepsMenuItems] = useState([])
-    const [anchorEl, setAnchorEl] = useState(null)
-
     const [isEventInputModalOpen, setIsEventInputModalOpen] = useState(false)
     const [selectedEventId, setSelectedEventId] = useState(null)
 
     const { eventFlowMap } = useContext(EventFlowContext)
-
-    const isProgressMenuOpen = Boolean(anchorEl)
-
-    const alwaysAvailableApplicationEventMenuItems = eventFlowMap
-        ?.filter((e) => e.alwaysAvailable)
-        .filter((e) => e.isDeleted === 0)
-        .map((e) => (
-            <MenuItem
-                key={e.id}
-                onClick={(event) => updateApplicationStatus(event, e.id)}
-            >
-                {e.name}
-            </MenuItem>
-        ))
 
     const currentApplicationStep = eventFlowMap.find(
         (e) => e.id === application.statusId
@@ -39,39 +29,21 @@ export default function ({ application, onApplicationStatusChange }) {
         currentApplicationStep?.availableNextStepIds.length > 0
 
     useEffect(() => {
+        const alwaysAvailable = eventFlowMap
+            ?.filter((e) => e.alwaysAvailable)
+            .filter((e) => e.isDeleted === 0)
+
         const nextSteps = eventFlowMap.filter((eventFlow) =>
-            currentApplicationStep.availableNextStepIds.includes(eventFlow.id)
+            currentApplicationStep?.availableNextStepIds.includes(eventFlow.id)
         )
 
-        const progressEventMenuItems = nextSteps?.map((nextStep) => (
-            <MenuItem
-                key={nextStep.id}
-                onClick={(event) => updateApplicationStatus(event, nextStep.id)}
-            >
-                {nextStep.name}
-            </MenuItem>
-        ))
-        setNextStepsMenuItems([
-            ...progressEventMenuItems,
-            ...alwaysAvailableApplicationEventMenuItems,
-        ])
-    }, [eventFlowMap, application])
+        setNextStepsMenuItems([...nextSteps, ...alwaysAvailable])
+    }, [eventFlowMap, application, currentApplicationStep])
 
     const updateApplicationStatus = (event, applicationStateId) => {
         event.stopPropagation()
         setSelectedEventId(applicationStateId)
         setIsEventInputModalOpen(true)
-        handleNextStepClose()
-    }
-
-    const handleNextStepClick = (event) => {
-        event.stopPropagation()
-        setAnchorEl(event.currentTarget)
-    }
-
-    const handleNextStepClose = (event) => {
-        event?.stopPropagation()
-        setAnchorEl(null)
     }
 
     const handleEventInputModalClose = () => {
@@ -79,65 +51,76 @@ export default function ({ application, onApplicationStatusChange }) {
         onApplicationStatusChange()
     }
 
-    return (
-        <Stack
-            direction="row"
-            justifyContent="space-between"
-            sx={{ width: '100%' }}
+    const menuTrigger = (
+        <button
+            onClick={(e) => e.stopPropagation()}
+            disabled={!canApplicationProgress}
+            className={`
+                flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded
+                transition-colors duration-150
+                ${canApplicationProgress
+                    ? 'bg-accent-500 text-white hover:bg-accent-600'
+                    : 'bg-[var(--bg-tertiary)] text-[var(--text-muted)] cursor-not-allowed'
+                }
+            `}
         >
-            <Stack direction="row" alignItems="center" spacing={1}>
+            {currentApplicationStep?.name}
+            {canApplicationProgress && <ChevronDownIcon />}
+        </button>
+    )
+
+    return (
+        <div className="flex justify-between w-full">
+            <div className="flex items-center gap-3">
                 <Logo
                     companyName={application.companyName}
                     logoPath={application.companyLogoPath}
                 />
-                <Stack>
-                    <Typography variant="body1">{application.role}</Typography>
-                    <Typography variant="body2">
+                <div className="flex flex-col">
+                    <span className="text-[var(--text-primary)]">{application.role}</span>
+                    <span className="text-sm text-[var(--text-secondary)]">
                         {application.companyName}
-                    </Typography>
-                </Stack>
-            </Stack>
-            <Stack direction="row" spacing={1}>
-                <Stack alignItems="flex-end">
-                    <Button
-                        size="small"
-                        variant="contained"
-                        endIcon={<ArrowDropDown />}
-                        onClick={handleNextStepClick}
-                        disabled={!canApplicationProgress}
-                    >
-                        {currentApplicationStep?.name}
-                    </Button>
-                    <Menu
-                        anchorEl={anchorEl}
-                        open={isProgressMenuOpen}
-                        onClose={handleNextStepClose}
-                    >
-                        {nextStepsMenuItems}
-                    </Menu>
+                    </span>
+                </div>
+            </div>
+            <div className="flex items-center gap-2">
+                <div className="flex flex-col items-end gap-1">
+                    {canApplicationProgress ? (
+                        <Menu trigger={menuTrigger} align="end">
+                            {nextStepsMenuItems.map((step) => (
+                                <MenuItem
+                                    key={step.id}
+                                    onClick={(event) => updateApplicationStatus(event, step.id)}
+                                >
+                                    {step.name}
+                                </MenuItem>
+                            ))}
+                        </Menu>
+                    ) : (
+                        menuTrigger
+                    )}
                     <EstimatedTimeAgo date={application.lastUpdated} />
-                </Stack>
+                </div>
                 {canApplicationProgress && (
                     <VerticalPercentBar
                         fillPercentage={application.percentGhosted}
                     />
                 )}
-            </Stack>
-            <Modal
-                isOpen={isEventInputModalOpen}
-                onClose={handleEventInputModalClose}
-                header={
+            </div>
+
+            <Dialog open={isEventInputModalOpen} onOpenChange={(open) => !open && handleEventInputModalClose()}>
+                <DialogContent title={
                     eventFlowMap.find(
                         (eventFlow) => eventFlow.id === selectedEventId
                     )?.name || ''
-                }
-            >
-                <EventInputEdit
-                    onclose={handleEventInputModalClose}
-                    eventId={selectedEventId}
-                    applicationId={application.id}
-                />
-            </Modal>
-        </Stack>
+                }>
+                    <EventInputEdit
+                        onclose={handleEventInputModalClose}
+                        eventId={selectedEventId}
+                        applicationId={application.id}
+                    />
+                </DialogContent>
+            </Dialog>
+        </div>
     )
 }

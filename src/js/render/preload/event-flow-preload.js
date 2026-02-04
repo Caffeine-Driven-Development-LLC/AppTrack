@@ -3,6 +3,7 @@ import {
     requestCreateApplicationState,
     requestDeleteApplicationState,
     requestEventFlowMap,
+    requestReorderApplicationStates,
     requestSwapOrderOfApplicationStates,
     requestUpdateApplicationState,
     responseEventFlowMap,
@@ -16,6 +17,9 @@ export default function () {
 
         swapOrderOfApplicationStates: (args) =>
             ipcRenderer.send(requestSwapOrderOfApplicationStates, args),
+
+        reorderApplicationStates: (args) =>
+            ipcRenderer.send(requestReorderApplicationStates, args),
 
         createApplicationState: (args) =>
             ipcRenderer.send(requestCreateApplicationState, args),

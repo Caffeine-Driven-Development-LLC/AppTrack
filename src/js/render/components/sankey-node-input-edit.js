@@ -1,26 +1,20 @@
 import React, { useContext, useState } from 'react'
 import { EventFlowContext } from '../main-window/event-flow-context.js'
 import {
-    Box,
     Button,
     Chip,
+    ColorInput,
     Dialog,
-    DialogActions,
     DialogContent,
-    DialogContentText,
-    DialogTitle,
-    FormControl,
-    InputLabel,
-    MenuItem,
+    DialogClose,
+    Input,
     Select,
-    Stack,
-    TextField,
-} from '@mui/material'
-import { MuiColorInput } from 'mui-color-input'
+    SelectItem,
+} from '../ui/index.js'
 
-export default function ({
-    onClose: onClose,
-    initialSankeyNode: initialSankeyNode,
+export default function SankeyNodeInputEdit({
+    onClose,
+    initialSankeyNode,
 }) {
     const [sankeyNode, setSankeyNode] = useState(
         initialSankeyNode || {
@@ -39,6 +33,13 @@ export default function ({
         setSankeyNode((prevState) => ({
             ...prevState,
             [id]: value,
+        }))
+    }
+
+    const handleColorChange = (color) => {
+        setSankeyNode((prevState) => ({
+            ...prevState,
+            color: color,
         }))
     }
 
@@ -62,8 +63,8 @@ export default function ({
         onClose()
     }
 
-    const handleNewAssignedStep = (event) => {
-        const newStep = event.target.value
+    const handleNewAssignedStep = (value) => {
+        const newStep = parseInt(value)
         setAssignStepText('')
         setSankeyNode((prevState) => ({
             ...prevState,
@@ -71,7 +72,7 @@ export default function ({
         }))
     }
 
-    const handleRemoveAssignedStep = (event, id) => {
+    const handleRemoveAssignedStep = (id) => {
         setSankeyNode((prevState) => ({
             ...prevState,
             applicationStateIds: prevState.applicationStateIds.filter(
@@ -80,129 +81,109 @@ export default function ({
         }))
     }
 
+    const availableSteps = eventFlowMap
+        .filter((e) => !sankeyNode.applicationStateIds.includes(e.id))
+        .filter((e) => e.isDeleted === 0)
+
     return (
         <form onSubmit={handleSubmit}>
-            <Stack spacing={2} sx={{ minWidth: '400px' }}>
-                <TextField
-                    size="small"
+            <div className="flex flex-col gap-4 min-w-[400px]">
+                <Input
                     id="name"
                     label="Name"
                     value={sankeyNode.name || ''}
-                    variant="outlined"
                     onChange={handleChange}
                     required
                 />
-                <MuiColorInput
-                    id="color"
+
+                <ColorInput
                     label="Color"
-                    format="hex"
-                    value={sankeyNode.color || ''}
-                    onChange={(event) =>
-                        handleChange({
-                            target: { id: 'color', value: event },
-                        })
-                    }
-                    isAlphaHidden
+                    value={sankeyNode.color || '#5bbbbb'}
+                    onChange={handleColorChange}
                 />
-                <Box>
-                    {sankeyNode.applicationStateIds.map(
-                        (applicationStateId) => {
-                            const e = eventFlowMap.find(
-                                (e) => e.id === applicationStateId
-                            )
+
+                <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-[var(--text-secondary)]">
+                        Assigned application steps
+                    </label>
+                    <div className="flex flex-wrap gap-1.5">
+                        {sankeyNode.applicationStateIds.map((applicationStateId) => {
+                            const e = eventFlowMap.find((e) => e.id === applicationStateId)
+                            if (!e) return null
                             return (
                                 <Chip
-                                    label={e.name}
                                     key={e.id}
-                                    onDelete={(event) =>
-                                        handleRemoveAssignedStep(event, e.id)
-                                    }
-                                    sx={{ margin: 0.5 }}
-                                />
+                                    onDelete={() => handleRemoveAssignedStep(e.id)}
+                                >
+                                    {e.name}
+                                </Chip>
                             )
-                        }
-                    )}
-                </Box>
-                {sankeyNode.id && !sankeyNode.isPermanent && (
-                    <FormControl fullWidth>
-                        <InputLabel id="assignToApplicaionStepLabel">
-                            Assign to application step
-                        </InputLabel>
-                        <Select
-                            labelId="assignToApplicaionStepLabel"
-                            size="small"
-                            id="assignToApplicaionStepBox"
-                            label="Assign to application step"
-                            onChange={handleNewAssignedStep}
-                            value={assignStepText}
-                        >
-                            {eventFlowMap
-                                .filter(
-                                    (e) =>
-                                        !sankeyNode.applicationStateIds.includes(
-                                            e.id
-                                        )
-                                )
-                                .filter((e) => e.isDeleted === 0)
-                                .map((event) => {
-                                    return (
-                                        <MenuItem
-                                            key={event.id}
-                                            value={event.id}
-                                        >
-                                            {event.name}
-                                        </MenuItem>
-                                    )
-                                })}
-                        </Select>
-                    </FormControl>
+                        })}
+                        {sankeyNode.applicationStateIds.length === 0 && (
+                            <span className="text-sm text-[var(--text-muted)]">None assigned</span>
+                        )}
+                    </div>
+                </div>
+
+                {sankeyNode.id && !sankeyNode.isPermanent && availableSteps.length > 0 && (
+                    <Select
+                        label="Assign to application step"
+                        value={assignStepText}
+                        onValueChange={handleNewAssignedStep}
+                        placeholder="Select a step..."
+                    >
+                        {availableSteps.map((event) => (
+                            <SelectItem key={event.id} value={String(event.id)}>
+                                {event.name}
+                            </SelectItem>
+                        ))}
+                    </Select>
                 )}
-                <Stack direction="row-reverse" spacing={1}>
-                    <Button
-                        size="small"
-                        variant="contained"
-                        type="submit"
-                        vaiant="contained"
-                    >
-                        Submit
-                    </Button>
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={handleCancel}
-                    >
-                        Cancel
-                    </Button>
+
+                <div className="flex justify-end gap-2 pt-2">
                     {sankeyNode.id && !sankeyNode.isPermanent && (
                         <Button
-                            size="small"
+                            type="button"
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setIsDeleteDialogOpen(true)}
                         >
                             Delete
                         </Button>
                     )}
-                </Stack>
-            </Stack>
-            <Dialog
-                open={isDeleteDialogOpen}
-                onClose={() => setIsDeleteDialogOpen(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">
-                    Delete Sankey Node
-                </DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to delete this sankey node?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDelete}>Delete</Button>
-                    <Button onClick={() => setIsDeleteDialogOpen(false)}>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleCancel}
+                    >
                         Cancel
                     </Button>
-                </DialogActions>
+                    <Button type="submit" size="sm">
+                        Submit
+                    </Button>
+                </div>
+            </div>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => !open && setIsDeleteDialogOpen(false)}>
+                <DialogContent title="Delete Sankey Node">
+                    <div className="flex flex-col gap-4">
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            Are you sure you want to delete this sankey node?
+                        </p>
+                        <div className="flex justify-end gap-2">
+                            <DialogClose>
+                                <Button variant="secondary" size="sm">
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+                            <Button variant="danger" size="sm" onClick={handleDelete}>
+                                Delete
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
             </Dialog>
         </form>
     )

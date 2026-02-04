@@ -1,17 +1,8 @@
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogContentText,
-    DialogTitle,
-    Stack,
-    TextField,
-} from '@mui/material'
 import React, { useState } from 'react'
 import { getCurrentDateString } from '../utils/date-utils.js'
+import { Button, Dialog, DialogContent, DialogClose, TextArea } from '../ui/index.js'
 
-export default function ({ onclose, applicationId, note }) {
+export default function ApplicationNoteInputEdit({ onclose, applicationId, note }) {
     const [noteInput, setNoteInput] = useState(
         note || {
             applicationId: applicationId,
@@ -32,16 +23,13 @@ export default function ({ onclose, applicationId, note }) {
 
     const handleSubmit = (event) => {
         event.preventDefault()
-        console.log('noteInput in handle submit', noteInput)
         if (noteInput.id) {
-            console.log('updating note')
             window.applicationApi.updateEvent(
                 noteInput.id,
                 noteInput,
                 applicationId
             )
         } else {
-            console.log('creating note')
             window.applicationApi.createEvent(noteInput)
         }
         onclose()
@@ -55,49 +43,49 @@ export default function ({ onclose, applicationId, note }) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <Stack spacing={2}>
-                <TextField
+            <div className="flex flex-col gap-4 min-w-[400px]">
+                <TextArea
                     id="notes"
                     label="Notes"
-                    multiline
-                    rows={4}
                     value={noteInput.notes}
                     onChange={handleChange}
-                    sx={{ width: '500px' }}
-                    required={true}
+                    rows={4}
+                    required
                 />
-                <Stack direction="row-reverse" spacing={2}>
-                    <Button type="submit" variant="contained">
-                        Save
-                    </Button>
-                    <Button variant="outlined" onClick={onclose}>
-                        Cancel
-                    </Button>
+
+                <div className="flex justify-end gap-2">
                     {noteInput.id && (
-                        <Button onClick={() => setIsDeleteDialogOpen(true)}>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            onClick={() => setIsDeleteDialogOpen(true)}
+                        >
                             Delete
                         </Button>
                     )}
-                </Stack>
-            </Stack>
-            <Dialog
-                open={isDeleteDialogOpen}
-                onClose={() => setIsDeleteDialogOpen(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">Delete Note</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to delete this note?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDelete}>Delete</Button>
-                    <Button onClick={() => setIsDeleteDialogOpen(false)}>
+                    <Button type="button" variant="secondary" onClick={onclose}>
                         Cancel
                     </Button>
-                </DialogActions>
+                    <Button type="submit">
+                        Save
+                    </Button>
+                </div>
+            </div>
+
+            <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => !open && setIsDeleteDialogOpen(false)}>
+                <DialogContent title="Delete Note">
+                    <p className="text-sm text-[var(--text-secondary)] mb-4">
+                        Are you sure you want to delete this note?
+                    </p>
+                    <div className="flex justify-end gap-2">
+                        <DialogClose>
+                            <Button variant="secondary" size="sm">Cancel</Button>
+                        </DialogClose>
+                        <Button variant="danger" size="sm" onClick={handleDelete}>
+                            Delete
+                        </Button>
+                    </div>
+                </DialogContent>
             </Dialog>
         </form>
     )

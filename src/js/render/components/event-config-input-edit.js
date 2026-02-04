@@ -1,28 +1,20 @@
+import React, { useContext, useState } from 'react'
+import { EventFlowContext } from '../main-window/event-flow-context.js'
 import {
-    Box,
     Button,
     Chip,
     Dialog,
-    DialogActions,
     DialogContent,
-    DialogContentText,
-    DialogTitle,
-    FormControl,
-    FormControlLabel,
-    InputLabel,
-    MenuItem,
+    DialogClose,
+    Input,
     Select,
-    Stack,
+    SelectItem,
     Switch,
-    TextField,
-    Typography,
-} from '@mui/material'
-import React, { useContext, useState } from 'react'
-import { EventFlowContext } from '../main-window/event-flow-context.js'
+} from '../ui/index.js'
 
-export default function ({
-    onClose: onClose,
-    initialApplicationEvent: initialApplicationEvent,
+export default function EventConfigInputEdit({
+    onClose,
+    initialApplicationEvent,
 }) {
     const [selectedNextStep, setSelectedNextStep] = useState('')
     const [applicationEvent, setApplicationEvent] = useState(
@@ -45,13 +37,11 @@ export default function ({
         }))
     }
 
-    const handleSwitchChange = (event) => {
-        let { id, checked } = event.target
+    const handleSwitchChange = (id, checked) => {
         setApplicationEvent((prevState) => ({
             ...prevState,
             [id]: checked ? 1 : 0,
         }))
-        console.log('applicationEvent', applicationEvent)
     }
 
     const handleCancel = () => {
@@ -77,7 +67,7 @@ export default function ({
         onClose()
     }
 
-    const handleRemoveNextStep = (event, nextStepId) => {
+    const handleRemoveNextStep = (nextStepId) => {
         setApplicationEvent((prevState) => ({
             ...prevState,
             availableNextStepIds: prevState.availableNextStepIds.filter(
@@ -86,8 +76,8 @@ export default function ({
         }))
     }
 
-    const handleNewPossibleNextStep = (event) => {
-        const nextStepId = event.target.value
+    const handleNewPossibleNextStep = (value) => {
+        const nextStepId = parseInt(value)
         setSelectedNextStep('')
         setApplicationEvent((prevState) => ({
             ...prevState,
@@ -98,133 +88,119 @@ export default function ({
         }))
     }
 
+    const availableNextSteps = eventFlowMap
+        .filter((e) => !applicationEvent.availableNextStepIds.includes(e.id))
+        .filter((e) => e.alwaysAvailable === 0)
+        .filter((e) => e.initialStep === 0)
+        .filter((e) => e.isDeleted === 0)
+
     return (
         <form onSubmit={handleSubmit}>
-            <Stack spacing={2} sx={{ minWidth: '400px' }}>
-                <TextField
-                    size="small"
+            <div className="flex flex-col gap-4 min-w-[400px]">
+                <Input
                     id="name"
                     label="Name"
-                    variant="outlined"
                     value={applicationEvent.name || ''}
                     onChange={handleChange}
                     required
                 />
-                <FormControlLabel
-                    control={
-                        <Switch
-                            size="small"
-                            id="alwaysAvailable"
-                            checked={applicationEvent.alwaysAvailable === 1}
-                            onChange={handleSwitchChange}
-                        />
-                    }
+
+                <Switch
+                    id="alwaysAvailable"
+                    checked={applicationEvent.alwaysAvailable === 1}
+                    onCheckedChange={(checked) => handleSwitchChange('alwaysAvailable', checked)}
                     label="Always available"
                 />
-                <FormControlLabel
-                    control={
-                        <Switch
-                            size="small"
-                            id="initialStep"
-                            checked={applicationEvent.initialStep === 1}
-                            onChange={handleSwitchChange}
-                        />
-                    }
+
+                <Switch
+                    id="initialStep"
+                    checked={applicationEvent.initialStep === 1}
+                    onCheckedChange={(checked) => handleSwitchChange('initialStep', checked)}
                     label="Initial step"
                 />
-                <Typography>Possible next steps</Typography>
-                <Box>
-                    {applicationEvent.availableNextStepIds.map((nextStepId) => {
-                        const e = eventFlowMap.find((e) => e.id == nextStepId)
-                        return (
-                            <Chip
-                                label={e.name}
-                                key={e.id}
-                                onDelete={(event) =>
-                                    handleRemoveNextStep(event, e.id)
-                                }
-                                sx={{ margin: 0.5 }}
-                            />
-                        )
-                    })}
-                </Box>
 
-                <FormControl fullWidth>
-                    <InputLabel id="addNewNextStepSelectBox">
-                        Add new possible next step
-                    </InputLabel>
-                    <Select
-                        labelId="addNewNextStepSelectBox"
-                        size="small"
-                        id="addNewNextStepSelectBox"
-                        label="Add new possible next step"
-                        onChange={handleNewPossibleNextStep}
-                        value={selectedNextStep}
-                    >
-                        {eventFlowMap
-                            .filter(
-                                (e) =>
-                                    !applicationEvent.availableNextStepIds.includes(
-                                        e.id
-                                    )
-                            )
-                            .filter((e) => e.alwaysAvailable === 0)
-                            .filter((e) => e.initialStep === 0)
-                            .filter((e) => e.isDeleted === 0)
-                            .map((eventFlow) => (
-                                <MenuItem
-                                    key={eventFlow.id}
-                                    value={eventFlow.id}
+                <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-[var(--text-secondary)]">
+                        Possible next steps
+                    </label>
+                    <div className="flex flex-wrap gap-1.5">
+                        {applicationEvent.availableNextStepIds.map((nextStepId) => {
+                            const e = eventFlowMap.find((e) => e.id === nextStepId)
+                            if (!e) return null
+                            return (
+                                <Chip
+                                    key={e.id}
+                                    onDelete={() => handleRemoveNextStep(e.id)}
                                 >
-                                    {eventFlow.name}
-                                </MenuItem>
-                            ))}
+                                    {e.name}
+                                </Chip>
+                            )
+                        })}
+                        {applicationEvent.availableNextStepIds.length === 0 && (
+                            <span className="text-sm text-[var(--text-muted)]">None selected</span>
+                        )}
+                    </div>
+                </div>
+
+                {availableNextSteps.length > 0 && (
+                    <Select
+                        label="Add new possible next step"
+                        value={selectedNextStep}
+                        onValueChange={handleNewPossibleNextStep}
+                        placeholder="Select a step..."
+                    >
+                        {availableNextSteps.map((eventFlow) => (
+                            <SelectItem key={eventFlow.id} value={String(eventFlow.id)}>
+                                {eventFlow.name}
+                            </SelectItem>
+                        ))}
                     </Select>
-                </FormControl>
-                <Stack direction="row-reverse" spacing={1}>
-                    <Button
-                        size="small"
-                        variant="contained"
-                        type="submit"
-                        vaiant="contained"
-                    >
-                        Submit
-                    </Button>
-                    <Button
-                        size="small"
-                        variant="outlined"
-                        onClick={handleCancel}
-                    >
-                        Cancel
-                    </Button>
+                )}
+
+                <div className="flex justify-end gap-2 pt-2">
                     {applicationEvent.id && (
                         <Button
-                            size="small"
+                            type="button"
+                            variant="ghost"
+                            size="sm"
                             onClick={() => setIsDeleteDialogOpen(true)}
                         >
                             Delete
                         </Button>
                     )}
-                </Stack>
-            </Stack>
-            <Dialog
-                open={isDeleteDialogOpen}
-                onClose={() => setIsDeleteDialogOpen(false)}
-                aria-labelledby="alert-dialog-title"
-                aria-describedby="alert-dialog-description"
-            >
-                <DialogTitle id="alert-dialog-title">Delete Step</DialogTitle>
-                <DialogContent>
-                    <DialogContentText id="alert-dialog-description">
-                        Are you sure you want to delete this step?
-                    </DialogContentText>
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={handleDelete}>Delete</Button>
-                    <Button onClick={() => setIsDeleteDialogOpen(false)}>
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={handleCancel}
+                    >
                         Cancel
                     </Button>
-                </DialogActions>
+                    <Button type="submit" size="sm">
+                        Submit
+                    </Button>
+                </div>
+            </div>
+
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={isDeleteDialogOpen} onOpenChange={(open) => !open && setIsDeleteDialogOpen(false)}>
+                <DialogContent title="Delete Step">
+                    <div className="flex flex-col gap-4">
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            Are you sure you want to delete this step?
+                        </p>
+                        <div className="flex justify-end gap-2">
+                            <DialogClose>
+                                <Button variant="secondary" size="sm">
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+                            <Button variant="danger" size="sm" onClick={handleDelete}>
+                                Delete
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
             </Dialog>
         </form>
     )

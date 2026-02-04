@@ -1,10 +1,8 @@
-import { Button, Stack, TextField } from '@mui/material'
-import dayjs from 'dayjs'
-import { DatePicker } from '@mui/x-date-pickers'
 import React, { useState } from 'react'
 import { getCurrentDateString } from '../utils/date-utils.js'
+import { Button, DatePicker, TextArea } from '../ui/index.js'
 
-export default function ({ onclose, eventId, applicationId, event }) {
+export default function EventInputEdit({ onclose, eventId, applicationId, event }) {
     const [eventInput, setEventInput] = useState(
         event || {
             applicationId: applicationId,
@@ -49,53 +47,40 @@ export default function ({ onclose, eventId, applicationId, event }) {
 
     return (
         <form onSubmit={handleSubmit}>
-            <Stack spacing={2}>
+            <div className="flex flex-col gap-4 min-w-[400px]">
                 <DatePicker
                     label="Date"
-                    defaultValue={dayjs()}
-                    value={dayjs(eventInput.date)}
-                    onChange={(date) =>
+                    value={eventInput.date}
+                    onChange={(value) =>
                         handleChange({
-                            target: {
-                                id: 'date',
-                                value: date?.format('YYYY-MM-DD'),
-                            },
+                            target: { id: 'date', value },
                         })
                     }
-                    slotProps={{
-                        textField: {
-                            size: 'small',
-                            required: true,
-                        },
-                    }}
-                    renderInput={(params) => (
-                        <TextField {...params} required error={dateError} />
-                    )}
+                    required
+                    error={dateError}
                 />
-                <TextField
-                    size="small"
+
+                <TextArea
                     id="notes"
                     label="Notes"
-                    variant="outlined"
                     value={eventInput.notes || ''}
                     onChange={handleChange}
-                    multiline
                     rows={3}
-                    sx={{ width: '500px' }}
                 />
-                <Stack direction="row-reverse" spacing={2}>
-                    <Button variant="contained" color="primary" type="submit">
-                        Save
-                    </Button>
+
+                <div className="flex justify-end gap-2">
                     <Button
-                        variant="outlined"
-                        color="primary"
+                        type="button"
+                        variant="secondary"
                         onClick={() => onclose()}
                     >
                         Cancel
                     </Button>
-                </Stack>
-            </Stack>
+                    <Button type="submit">
+                        Save
+                    </Button>
+                </div>
+            </div>
         </form>
     )
 }

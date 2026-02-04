@@ -2,6 +2,7 @@ import { createRoot } from 'react-dom/client'
 import Navigation from '../components/navigation.js'
 import { ViewContextProvider } from './view-context.js'
 import { EventFlowContextProvider } from './event-flow-context.js'
+import { TooltipProvider } from '../ui/Tooltip.jsx'
 import { useEffect } from 'react'
 
 const container = document.getElementById('root')
@@ -34,11 +35,13 @@ function App() {
     }, [])
 
     return (
-        <ViewContextProvider>
-            <EventFlowContextProvider>
-                <Navigation />
-            </EventFlowContextProvider>
-        </ViewContextProvider>
+        <TooltipProvider>
+            <ViewContextProvider>
+                <EventFlowContextProvider>
+                    <Navigation />
+                </EventFlowContextProvider>
+            </ViewContextProvider>
+        </TooltipProvider>
     )
 }
 

@@ -11,9 +11,80 @@ import {
     Select,
     SelectItem,
     Switch,
-    Tooltip,
-    TooltipProvider,
 } from '../../ui/index.js'
+
+// Icons
+function ChevronRightIcon() {
+    return (
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 3L11 8L6 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+    )
+}
+
+function SettingRow({ label, description, children }) {
+    return (
+        <div className="flex items-center justify-between gap-6 py-3">
+            <div className="flex flex-col gap-0.5 min-w-0">
+                <span className="text-sm font-medium text-[var(--text-primary)]">{label}</span>
+                {description && (
+                    <span className="text-xs text-[var(--text-muted)]">{description}</span>
+                )}
+            </div>
+            <div className="flex-shrink-0">
+                {children}
+            </div>
+        </div>
+    )
+}
+
+function SettingLink({ label, description, onClick }) {
+    return (
+        <button
+            onClick={onClick}
+            className="w-full flex items-center justify-between gap-4 py-3 group text-left"
+        >
+            <div className="flex flex-col gap-0.5 min-w-0">
+                <span className="text-sm font-medium text-[var(--text-primary)] group-hover:text-accent-500 transition-colors">
+                    {label}
+                </span>
+                {description && (
+                    <span className="text-xs text-[var(--text-muted)]">{description}</span>
+                )}
+            </div>
+            <span className="text-[var(--text-muted)] group-hover:text-accent-500 transition-colors flex-shrink-0">
+                <ChevronRightIcon />
+            </span>
+        </button>
+    )
+}
+
+function SettingsCard({ title, danger, children }) {
+    return (
+        <section className={`
+            border rounded-lg overflow-hidden
+            ${danger
+                ? 'border-negative/30 bg-negative/5'
+                : 'border-[var(--border-color)] bg-[var(--bg-secondary)]'
+            }
+        `}>
+            <div className={`
+                px-4 py-2.5 border-b
+                ${danger
+                    ? 'border-negative/30'
+                    : 'border-[var(--border-color)]'
+                }
+            `}>
+                <h3 className={`text-xs font-semibold uppercase tracking-wider ${danger ? 'text-negative' : 'text-[var(--text-muted)]'}`}>
+                    {title}
+                </h3>
+            </div>
+            <div className="px-4 divide-y divide-[var(--border-color)]">
+                {children}
+            </div>
+        </section>
+    )
+}
 
 export default function Settings() {
     const [settings, setSettings] = useState(null)
@@ -45,8 +116,8 @@ export default function Settings() {
         window.updateApi.getCurrentAppVersion()
 
         return () => {
-            window.settingsApi.removeListener(() => {})
-            window.updateApi.removeListener(() => {})
+            window.settingsApi.removeListeners()
+            window.updateApi.removeListeners()
         }
     }, [])
 
@@ -79,26 +150,12 @@ export default function Settings() {
         window.updateApi.requestUpdateApplication()
     }
 
-    const handleConfigureApplicationEventsButton = (event) => {
-        event.stopPropagation()
-        pushView(<EventFlowConfig />, 'Configure Application Events')
-    }
-
-    const handleConfigureSankeyDiagramButton = (event) => {
-        event.stopPropagation()
-        pushView(<SankeyConfig />, 'Configure Sankey Diagram')
-    }
-
     const handleDisplayThemeSelectChange = (value) => {
         setSettings((prevState) => ({
             ...prevState,
             displayTheme: value,
         }))
         window.settingsApi.setDisplayTheme(value)
-    }
-
-    const handleDeleteApplicationDateTextFieldChange = (event) => {
-        setDeleteConfirmationTextField(event.target.value)
     }
 
     const handleModalClose = () => {
@@ -117,26 +174,22 @@ export default function Settings() {
         handleModalClose()
     }
 
-    const renderUpdateButton = () => {
+    const renderUpdateStatus = () => {
         if (!updateState) return null
-
         if (updateState.updateDownloaded) {
             return (
-                <div className="flex items-center gap-3">
-                    <span className="text-sm text-[var(--text-secondary)]">Update is ready to install</span>
-                    <Button size="sm" onClick={handleUpdateNow}>
-                        Restart & Update
-                    </Button>
-                </div>
+                <Button size="sm" onClick={handleUpdateNow}>
+                    Restart & Update
+                </Button>
             )
         } else if (updateState.updateAvailable) {
-            return <span className="text-sm text-[var(--text-muted)]">Downloading update...</span>
+            return <span className="text-xs text-[var(--text-muted)]">Downloading...</span>
         } else if (updateState.checkingForUpdate) {
-            return <span className="text-sm text-[var(--text-muted)]">Checking for updates...</span>
+            return <span className="text-xs text-[var(--text-muted)]">Checking...</span>
         } else if (!settings?.autoCheckForUpdates) {
             return (
                 <Button variant="secondary" size="sm" onClick={handleManualCheckForUpdates}>
-                    Check for updates
+                    Check now
                 </Button>
             )
         }
@@ -148,164 +201,166 @@ export default function Settings() {
     }
 
     return (
-        <TooltipProvider>
-            <div className="flex flex-col gap-6 p-4 max-w-2xl">
-                {/* General Section */}
-                <section>
-                    <h2 className="text-lg font-semibold text-[var(--text-primary)] border-b border-[var(--border-color)] pb-2 mb-4">
-                        General
-                    </h2>
-                    <div className="flex flex-col gap-4 pl-4">
-                        <div className="flex flex-col gap-2">
-                            <Switch
-                                checked={settings.autoCheckForUpdates}
-                                onCheckedChange={handleAutoUpdateSwitchChange}
-                                label="Automatically check for updates"
-                            />
-                            {renderUpdateButton()}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Theme Section */}
-                <section>
-                    <h2 className="text-lg font-semibold text-[var(--text-primary)] border-b border-[var(--border-color)] pb-2 mb-4">
-                        Theme
-                    </h2>
-                    <div className="pl-4">
+        <div className="flex flex-col gap-5 max-w-xl">
+            {/* General */}
+            <SettingsCard title="General">
+                <SettingRow label="Theme" description="Choose light, dark, or match your system">
+                    <div className="w-40">
                         <Select
-                            label="Appearance"
                             value={settings.displayTheme}
                             onValueChange={handleDisplayThemeSelectChange}
                         >
                             <SelectItem value="light">Light</SelectItem>
                             <SelectItem value="dark">Dark</SelectItem>
-                            <SelectItem value="system">System Default</SelectItem>
+                            <SelectItem value="system">System</SelectItem>
                         </Select>
                     </div>
-                </section>
-
-                {/* Application Tracking Section */}
-                <section>
-                    <h2 className="text-lg font-semibold text-[var(--text-primary)] border-b border-[var(--border-color)] pb-2 mb-4">
-                        Application Tracking
-                    </h2>
-                    <div className="flex flex-col gap-4 pl-4">
-                        <Tooltip content="The number of days past the latest event where an application is considered ghosted.">
-                            <div className="w-48">
-                                <Input
-                                    label="Ghost Period"
-                                    type="number"
-                                    value={settings.ghostPeriod || ''}
-                                    onChange={handleGhostPeriodChange}
-                                    error={!ghostPeriodIsValid(settings.ghostPeriod) ? 'Must be greater than 0' : undefined}
-                                />
-                            </div>
-                        </Tooltip>
-                        <div className="flex flex-wrap gap-3">
-                            <Button variant="secondary" size="sm" onClick={handleConfigureApplicationEventsButton}>
-                                Configure Application Events
-                            </Button>
-                            <Button variant="secondary" size="sm" onClick={handleConfigureSankeyDiagramButton}>
-                                Configure Sankey Diagram
-                            </Button>
-                        </div>
+                </SettingRow>
+                <SettingRow label="Auto-update" description="Automatically check for new versions">
+                    <div className="flex items-center gap-3">
+                        {renderUpdateStatus()}
+                        <Switch
+                            checked={settings.autoCheckForUpdates}
+                            onCheckedChange={handleAutoUpdateSwitchChange}
+                        />
                     </div>
-                </section>
+                </SettingRow>
+            </SettingsCard>
 
-                {/* Danger Zone Section */}
-                <section>
-                    <h2 className="text-lg font-semibold text-negative border-b border-[var(--border-color)] pb-2 mb-4">
-                        Danger Zone
-                    </h2>
-                    <div className="flex flex-col gap-4 pl-4">
-                        <div className="flex flex-wrap gap-3">
-                            <Button variant="danger" size="sm" onClick={() => setShowDeleteApplicationDataModal(true)}>
-                                Delete Application Data
-                            </Button>
-                            <Button variant="danger" size="sm" onClick={() => setShowDeleteAllDataModal(true)}>
-                                Delete All Data
-                            </Button>
-                        </div>
-                        <span className="text-xs text-[var(--text-muted)]">Version: {currentAppVersion}</span>
+            {/* Tracking */}
+            <SettingsCard title="Tracking">
+                <SettingRow
+                    label="Ghost period"
+                    description="Days of silence before an application is considered ghosted"
+                >
+                    <div className="w-20">
+                        <Input
+                            type="number"
+                            value={settings.ghostPeriod || ''}
+                            onChange={handleGhostPeriodChange}
+                            error={!ghostPeriodIsValid(settings.ghostPeriod) ? 'Invalid' : undefined}
+                        />
                     </div>
-                </section>
+                </SettingRow>
+                <SettingLink
+                    label="Application Steps"
+                    description="Define the stages of your hiring pipeline (e.g. Applied, Interview, Offer)"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        pushView(<EventFlowConfig />, 'Application Steps')
+                    }}
+                />
+                <SettingLink
+                    label="Analytics Graph"
+                    description="Customize how stages appear in your flow diagrams"
+                    onClick={(e) => {
+                        e.stopPropagation()
+                        pushView(<SankeyConfig />, 'Analytics Graph')
+                    }}
+                />
+            </SettingsCard>
 
-                {/* Delete Application Data Modal */}
-                <Dialog open={showDeleteApplicationDataModal} onOpenChange={(open) => !open && handleModalClose()}>
-                    <DialogContent title="Delete Application Data">
-                        <div className="flex flex-col gap-4">
-                            <p className="text-sm text-[var(--text-secondary)]">
-                                Are you sure you want to delete all application data?
-                            </p>
-                            <p className="text-sm text-[var(--text-muted)]">
-                                This will permanently delete all Applications and any events associated with them.
-                                Only company data, and the configurations for events and the sankey diagram will be preserved.
-                            </p>
-                            <p className="text-sm text-[var(--text-secondary)]">
-                                This action cannot be undone. Please type <strong className="text-[var(--text-primary)]">"DELETE"</strong> to confirm.
-                            </p>
-                            <Input
-                                label="Confirmation"
-                                value={deleteConfirmationTextField}
-                                onChange={handleDeleteApplicationDateTextFieldChange}
-                                placeholder="Type DELETE to confirm"
-                            />
-                            <div className="flex gap-3 justify-end mt-2">
-                                <DialogClose>
-                                    <Button variant="secondary" onClick={handleModalClose}>
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
-                                <Button
-                                    variant="danger"
-                                    onClick={handleDeleteApplicationData}
-                                    disabled={deleteConfirmationTextField.toUpperCase() !== 'DELETE'}
-                                >
-                                    Delete
-                                </Button>
-                            </div>
+            {/* Danger Zone */}
+            <SettingsCard title="Danger Zone" danger>
+                <div className="py-3 flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-0.5">
+                            <span className="text-sm font-medium text-[var(--text-primary)]">Delete application data</span>
+                            <span className="text-xs text-[var(--text-muted)]">
+                                Removes all applications and events. Keeps companies and configuration.
+                            </span>
                         </div>
-                    </DialogContent>
-                </Dialog>
+                        <Button variant="danger" size="sm" onClick={() => setShowDeleteApplicationDataModal(true)}>
+                            Delete
+                        </Button>
+                    </div>
+                    <div className="border-t border-[var(--border-color)]" />
+                    <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-0.5">
+                            <span className="text-sm font-medium text-[var(--text-primary)]">Reset everything</span>
+                            <span className="text-xs text-[var(--text-muted)]">
+                                Deletes all data and restores factory settings. App will restart.
+                            </span>
+                        </div>
+                        <Button variant="danger" size="sm" onClick={() => setShowDeleteAllDataModal(true)}>
+                            Reset
+                        </Button>
+                    </div>
+                </div>
+            </SettingsCard>
 
-                {/* Delete All Data Modal */}
-                <Dialog open={showDeleteAllDataModal} onOpenChange={(open) => !open && handleModalClose()}>
-                    <DialogContent title="Delete All Data">
-                        <div className="flex flex-col gap-4">
-                            <p className="text-sm text-[var(--text-secondary)]">
-                                Are you sure you want to delete all data?
-                            </p>
-                            <p className="text-sm text-[var(--text-muted)]">
-                                This will permanently delete all data. Effectively setting this application back to a fresh install state.
-                            </p>
-                            <p className="text-sm text-[var(--text-secondary)]">
-                                This action cannot be undone. Please type <strong className="text-[var(--text-primary)]">"DELETE"</strong> to confirm.
-                            </p>
-                            <Input
-                                label="Confirmation"
-                                value={deleteConfirmationTextField}
-                                onChange={handleDeleteApplicationDateTextFieldChange}
-                                placeholder="Type DELETE to confirm"
-                            />
-                            <div className="flex gap-3 justify-end mt-2">
-                                <DialogClose>
-                                    <Button variant="secondary" onClick={handleModalClose}>
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
-                                <Button
-                                    variant="danger"
-                                    onClick={handleDeleteAllData}
-                                    disabled={deleteConfirmationTextField.toUpperCase() !== 'DELETE'}
-                                >
-                                    Delete
-                                </Button>
-                            </div>
-                        </div>
-                    </DialogContent>
-                </Dialog>
+            {/* Version footer */}
+            <div className="text-xs text-[var(--text-muted)] text-center pt-2">
+                AppTrack v{currentAppVersion}
             </div>
-        </TooltipProvider>
+
+            {/* Delete Application Data Modal */}
+            <Dialog open={showDeleteApplicationDataModal} onOpenChange={(open) => !open && handleModalClose()}>
+                <DialogContent title="Delete Application Data">
+                    <div className="flex flex-col gap-4">
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            This will permanently delete all applications and their events.
+                            Company data and your pipeline configuration will be preserved.
+                        </p>
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            Type <strong className="text-[var(--text-primary)]">DELETE</strong> to confirm.
+                        </p>
+                        <Input
+                            value={deleteConfirmationTextField}
+                            onChange={(e) => setDeleteConfirmationTextField(e.target.value)}
+                            placeholder="Type DELETE to confirm"
+                        />
+                        <div className="flex gap-3 justify-end">
+                            <DialogClose>
+                                <Button variant="secondary" onClick={handleModalClose}>
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+                            <Button
+                                variant="danger"
+                                onClick={handleDeleteApplicationData}
+                                disabled={deleteConfirmationTextField.toUpperCase() !== 'DELETE'}
+                            >
+                                Delete
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {/* Delete All Data Modal */}
+            <Dialog open={showDeleteAllDataModal} onOpenChange={(open) => !open && handleModalClose()}>
+                <DialogContent title="Reset Everything">
+                    <div className="flex flex-col gap-4">
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            This will permanently delete all data and reset the app to a fresh install.
+                            The app will restart automatically.
+                        </p>
+                        <p className="text-sm text-[var(--text-secondary)]">
+                            Type <strong className="text-[var(--text-primary)]">DELETE</strong> to confirm.
+                        </p>
+                        <Input
+                            value={deleteConfirmationTextField}
+                            onChange={(e) => setDeleteConfirmationTextField(e.target.value)}
+                            placeholder="Type DELETE to confirm"
+                        />
+                        <div className="flex gap-3 justify-end">
+                            <DialogClose>
+                                <Button variant="secondary" onClick={handleModalClose}>
+                                    Cancel
+                                </Button>
+                            </DialogClose>
+                            <Button
+                                variant="danger"
+                                onClick={handleDeleteAllData}
+                                disabled={deleteConfirmationTextField.toUpperCase() !== 'DELETE'}
+                            >
+                                Reset
+                            </Button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </div>
     )
 }

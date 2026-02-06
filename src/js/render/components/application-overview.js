@@ -1,10 +1,32 @@
 import Logo from './logo.js'
 import EstimatedTimeAgo from './estimated-time-ago.js'
-import VerticalPercentBar from './vertical-percent-bar.js'
 import { useContext, useEffect, useState } from 'react'
 import EventInputEdit from './event-input-edit.js'
 import { EventFlowContext } from '../main-window/event-flow-context.js'
-import { Button, Dialog, DialogContent, Menu, MenuItem } from '../ui/index.js'
+import { Button, Dialog, DialogContent, Menu, MenuItem, Tooltip } from '../ui/index.js'
+
+function GhostProgressBar({ percentage }) {
+    const clamped = Math.min(percentage, 100)
+    const color = clamped < 33
+        ? 'var(--color-positive)'
+        : clamped < 66
+          ? 'var(--color-warning)'
+          : 'var(--color-negative)'
+    const label = clamped >= 100
+        ? 'Likely ghosted'
+        : `${parseInt(clamped)}% to ghost threshold`
+
+    return (
+        <Tooltip content={label}>
+            <div className="w-full h-1 rounded-full bg-[var(--bg-tertiary)] overflow-hidden">
+                <div
+                    className="h-full rounded-full transition-all duration-300"
+                    style={{ width: `${clamped}%`, backgroundColor: color }}
+                />
+            </div>
+        </Tooltip>
+    )
+}
 
 function ChevronDownIcon() {
     return (
@@ -69,22 +91,28 @@ export default function ApplicationOverview({ application, onApplicationStatusCh
         </button>
     )
 
+    const isGhosted = application.percentGhosted >= 100
+
     return (
-        <div className="flex justify-between w-full">
-            <div className="flex items-center gap-3">
-                <Logo
-                    companyName={application.companyName}
-                    logoPath={application.companyLogoPath}
-                />
-                <div className="flex flex-col">
-                    <span className="text-[var(--text-primary)]">{application.role}</span>
-                    <span className="text-sm text-[var(--text-secondary)]">
-                        {application.companyName}
-                    </span>
+        <div className="flex flex-col w-full gap-2">
+            <div className="flex justify-between w-full">
+                <div className="flex items-center gap-3">
+                    <Logo
+                        companyName={application.companyName}
+                        logoPath={application.companyLogoPath}
+                    />
+                    <div className="flex flex-col">
+                        <span className="font-medium text-[var(--text-primary)]">{application.role}</span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-sm text-[var(--text-secondary)]">
+                                {application.companyName}
+                            </span>
+                            <span className="text-[var(--text-muted)]">&middot;</span>
+                            <EstimatedTimeAgo date={application.lastUpdated} />
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div className="flex items-center gap-2">
-                <div className="flex flex-col items-end gap-1">
+                <div className="flex items-center gap-2">
                     {canApplicationProgress ? (
                         <Menu trigger={menuTrigger} align="end">
                             {nextStepsMenuItems.map((step) => (
@@ -99,14 +127,13 @@ export default function ApplicationOverview({ application, onApplicationStatusCh
                     ) : (
                         menuTrigger
                     )}
-                    <EstimatedTimeAgo date={application.lastUpdated} />
                 </div>
-                {canApplicationProgress && (
-                    <VerticalPercentBar
-                        fillPercentage={application.percentGhosted}
-                    />
-                )}
             </div>
+
+            {/* Ghost progress bar */}
+            {canApplicationProgress && application.percentGhosted > 0 && (
+                <GhostProgressBar percentage={application.percentGhosted} />
+            )}
 
             <Dialog open={isEventInputModalOpen} onOpenChange={(open) => !open && handleEventInputModalClose()}>
                 <DialogContent title={

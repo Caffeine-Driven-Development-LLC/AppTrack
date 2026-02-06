@@ -22,10 +22,13 @@ export default function VerticalPercentBar({ fillPercentage }) {
     const notFillHex = '#00000000'
 
     const barStyle = {
-        width: '10px',
+        width: '6px',
+        height: '36px',
+        borderRadius: '3px',
         background: `linear-gradient(to bottom,
     ${fillHex} ${fillPercentage}%,
     ${notFillHex} ${fillPercentage}%)`,
+        border: `1px solid ${isDarkTheme ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
     }
 
     const toolTipText = `${parseInt(fillPercentage)}% to ghosted`

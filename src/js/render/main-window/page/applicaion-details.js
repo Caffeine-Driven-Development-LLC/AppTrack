@@ -68,65 +68,85 @@ export default function ApplicationDetails({ initialApplication }) {
     }, [])
 
     return (
-        <div className="w-full">
-            <div className="flex flex-col gap-4">
-                <ApplicationOverview
-                    application={application}
-                    eventFlowMap={eventFlowMap}
-                    onApplicationStatusChange={handleApplicationStatusChange}
-                />
+        <div className="w-full max-w-3xl">
+            <div className="flex flex-col gap-5">
+                {/* Overview Card */}
+                <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4">
+                    <ApplicationOverview
+                        application={application}
+                        eventFlowMap={eventFlowMap}
+                        onApplicationStatusChange={handleApplicationStatusChange}
+                    />
 
+                    {/* Key details row */}
+                    {(application.salaryRangeHigh || application.postUrl) && (
+                        <div className="mt-3 pt-3 border-t border-[var(--border-color)] flex items-center gap-4 flex-wrap">
+                            {application.salaryRangeHigh && application.salaryRangeLow && (
+                                <div className="flex items-center gap-2">
+                                    <span className="text-xs text-[var(--text-muted)] uppercase tracking-wide">Salary</span>
+                                    <span className="text-sm font-medium text-[var(--text-primary)]">
+                                        ${Intl.NumberFormat().format(application.salaryRangeLow)} &ndash; ${Intl.NumberFormat().format(application.salaryRangeHigh)}
+                                    </span>
+                                </div>
+                            )}
+                            {application.postUrl && (
+                                <button
+                                    onClick={() => window.api.openLink(application.postUrl)}
+                                    className="text-sm text-accent-500 hover:underline"
+                                >
+                                    View Job Posting
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
+
+                {/* Actions */}
                 <div className="flex items-center gap-2">
                     <Button size="sm" onClick={handleAddNoteClick}>
                         Add Note
                     </Button>
-                    {application.postUrl && (
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => window.api.openLink(application.postUrl)}
-                        >
-                            Job Description
-                        </Button>
-                    )}
                     <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setIsApplicationInputModalOpen(true)}
                     >
-                        Edit
+                        Edit Application
                     </Button>
                 </div>
 
-                {application.salaryRangeHigh && application.salaryRangeLow && (
-                    <p className="text-[var(--text-primary)]">
-                        Salary Range: ${Intl.NumberFormat().format(application.salaryRangeLow)} - ${Intl.NumberFormat().format(application.salaryRangeHigh)}
-                    </p>
-                )}
-
                 {/* Timeline */}
-                <div className="flex flex-col">
-                    {events.map((event, index) => (
-                        <div key={event.id} className="flex">
-                            {/* Timeline marker */}
-                            <div className="flex flex-col items-center mr-4">
-                                <div className="w-3 h-3 rounded-full bg-accent-500 flex-shrink-0" />
-                                {index !== events.length - 1 && (
-                                    <div className="w-0.5 flex-1 bg-[var(--border-color)] my-1" />
-                                )}
-                            </div>
-                            {/* Content */}
-                            <div className="pb-4 flex-1">
-                                <TimelineEvent
-                                    date={event.date}
-                                    header={event.status}
-                                    comment={event.notes}
-                                    handleEditClick={(e) => handleEditEventClick(e, event)}
-                                />
-                            </div>
+                {events.length > 0 && (
+                    <div>
+                        <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-3">
+                            Timeline
+                        </h3>
+                        <div className="flex flex-col">
+                            {events.map((event, index) => (
+                                <div key={event.id} className="flex">
+                                    {/* Timeline marker */}
+                                    <div className="flex flex-col items-center mr-4">
+                                        <div className={`w-3 h-3 rounded-full flex-shrink-0 mt-0.5 ${
+                                            index === 0 ? 'bg-accent-500' : 'bg-[var(--border-color)]'
+                                        }`} />
+                                        {index !== events.length - 1 && (
+                                            <div className="w-0.5 flex-1 bg-[var(--border-color)] my-1" />
+                                        )}
+                                    </div>
+                                    {/* Content */}
+                                    <div className="pb-4 flex-1 -mt-0.5">
+                                        <TimelineEvent
+                                            date={event.date}
+                                            header={event.status}
+                                            comment={event.notes}
+                                            handleEditClick={(e) => handleEditEventClick(e, event)}
+                                        />
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
+                    </div>
+                )}
             </div>
 
             <Dialog open={isApplicationInputModalOpen} onOpenChange={(open) => !open && setIsApplicationInputModalOpen(false)}>

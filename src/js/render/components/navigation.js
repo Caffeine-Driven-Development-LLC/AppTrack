@@ -1,177 +1,161 @@
 import { useContext, useState } from 'react'
 import { ViewContext } from '../main-window/view-context.js'
+import Dashboard from '../main-window/page/dashboard.js'
 import Stats from '../main-window/page/stats.js'
 import CompanyList from '../main-window/page/company-list.js'
 import ApplicationList from '../main-window/page/application-list.js'
 import SettingsPage from '../main-window/page/settings.js'
+import ApplicationInputEdit from './application-input-edit.js'
+import { Dialog, DialogContent } from '../ui/index.js'
 
-// Icons
-function MenuIcon() {
+function PlusIcon() {
     return (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 5H17M3 10H17M3 15H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
         </svg>
     )
 }
 
-function ChevronLeftIcon() {
+function BackIcon() {
     return (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 15L7 10L12 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-    )
-}
-
-function ListIcon() {
-    return (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 4H17M3 8H17M3 12H17M3 16H17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-        </svg>
-    )
-}
-
-function BuildingIcon() {
-    return (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 17V5C3 4.44772 3.44772 4 4 4H10C10.5523 4 11 4.44772 11 5V17M11 17V9C11 8.44772 11.4477 8 12 8H16C16.5523 8 17 8.44772 17 9V17M3 17H17M6 7H8M6 10H8M6 13H8M14 11H15M14 14H15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10 3L5 8L10 13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
     )
 }
 
 function SettingsIcon() {
     return (
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" strokeWidth="1.5"/>
-            <path d="M16.1667 10C16.1667 9.58333 16.125 9.16667 16.0417 8.79167L17.7083 7.5L16.2917 5L14.375 5.75C13.8333 5.29167 13.2083 4.91667 12.5 4.66667L12.0833 2.5H9.16667L8.75 4.66667C8.04167 4.91667 7.41667 5.29167 6.875 5.75L4.95833 5L3.54167 7.5L5.20833 8.79167C5.125 9.16667 5.08333 9.58333 5.08333 10C5.08333 10.4167 5.125 10.8333 5.20833 11.2083L3.54167 12.5L4.95833 15L6.875 14.25C7.41667 14.7083 8.04167 15.0833 8.75 15.3333L9.16667 17.5H12.0833L12.5 15.3333C13.2083 15.0833 13.8333 14.7083 14.375 14.25L16.2917 15L17.7083 12.5L16.0417 11.2083C16.125 10.8333 16.1667 10.4167 16.1667 10Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-        </svg>
-    )
-}
-
-function ChevronRightIcon() {
-    return (
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M6 4L10 8L6 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            <path d="M8 10C9.10457 10 10 9.10457 10 8C10 6.89543 9.10457 6 8 6C6.89543 6 6 6.89543 6 8C6 9.10457 6.89543 10 8 10Z" stroke="currentColor" strokeWidth="1.5"/>
+            <path d="M13 8C13 7.66667 12.97 7.33333 12.91 7.03333L14.17 6L13.1 4L11.5 4.6C11.07 4.23333 10.57 3.93333 10 3.73333L9.67 2H7.33L7 3.73333C6.43 3.93333 5.93 4.23333 5.5 4.6L3.9 4L2.83 6L4.09 7.03333C4.03 7.33333 4 7.66667 4 8C4 8.33333 4.03 8.66667 4.09 8.96667L2.83 10L3.9 12L5.5 11.4C5.93 11.7667 6.43 12.0667 7 12.2667L7.33 14H9.67L10 12.2667C10.57 12.0667 11.07 11.7667 11.5 11.4L13.1 12L14.17 10L12.91 8.96667C12.97 8.66667 13 8.33333 13 8Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
     )
 }
 
 const NAV_ITEMS = [
-    { name: 'Applications', icon: ListIcon, view: ApplicationList },
-    { name: 'Companies', icon: BuildingIcon, view: CompanyList },
-]
-
-const BOTTOM_NAV_ITEMS = [
-    { name: 'Settings', icon: SettingsIcon, view: SettingsPage },
+    { name: 'Dashboard', view: Dashboard },
+    { name: 'Applications', view: ApplicationList },
+    { name: 'Companies', view: CompanyList },
+    { name: 'Analytics', view: Stats },
 ]
 
 export default function Navigation() {
-    const [isExpanded, setIsExpanded] = useState(false)
+    const [isQuickAddOpen, setIsQuickAddOpen] = useState(false)
     const { viewHistory, setViewHistory, currentView } = useContext(ViewContext)
+
+    const canGoBack = viewHistory.length > 1
+
+    // The top-level page name (first in history)
+    const rootPage = viewHistory[0]?.title
+    // Are we on a detail/sub page?
+    const isOnSubPage = viewHistory.length > 1
+    const currentTitle = currentView.title
 
     const handleNavClick = (item) => {
         setViewHistory([{ view: <item.view />, title: item.name }])
     }
 
-    const handleBreadcrumbClick = (index) => {
-        setViewHistory(viewHistory.slice(0, index + 1))
+    const handleBack = () => {
+        if (canGoBack) {
+            setViewHistory(viewHistory.slice(0, -1))
+        }
     }
 
-    const NavButton = ({ item }) => {
-        const Icon = item.icon
-        const isActive = currentView.title === item.name
-
-        return (
-            <button
-                onClick={() => handleNavClick(item)}
-                className={`
-                    w-full flex items-center gap-3 px-3 py-2 rounded-md
-                    transition-colors duration-150
-                    ${isActive
-                        ? 'bg-accent-500/20 text-accent-500'
-                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] hover:text-[var(--text-primary)]'
-                    }
-                `}
-                title={!isExpanded ? item.name : undefined}
-            >
-                <Icon />
-                {isExpanded && (
-                    <span className="text-sm font-medium whitespace-nowrap">
-                        {item.name}
-                    </span>
-                )}
-            </button>
-        )
+    const handleSettingsClick = () => {
+        setViewHistory([{ view: <SettingsPage />, title: 'Settings' }])
     }
 
     return (
-        <div className="flex h-screen">
-            {/* Sidebar */}
-            <aside
-                className={`
-                    flex flex-col
-                    bg-[var(--bg-secondary)] border-r border-[var(--border-color)]
-                    transition-all duration-200 ease-in-out
-                    ${isExpanded ? 'w-52' : 'w-14'}
-                `}
-            >
-                {/* Sidebar Header */}
-                <div className="h-12 flex items-center justify-center border-b border-[var(--border-color)]">
+        <div className="flex flex-col h-screen">
+            {/* Top Navigation Bar */}
+            <header className="h-11 flex items-center bg-[var(--bg-secondary)] border-b border-[var(--border-color)] px-3 gap-1 flex-shrink-0">
+                {/* Back button + breadcrumb when on sub-page */}
+                {isOnSubPage ? (
+                    <div className="flex items-center gap-1 flex-1 min-w-0">
+                        <button
+                            onClick={handleBack}
+                            className="p-1 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors flex-shrink-0"
+                        >
+                            <BackIcon />
+                        </button>
+                        <button
+                            onClick={handleBack}
+                            className="text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors flex-shrink-0"
+                        >
+                            {rootPage}
+                        </button>
+                        <span className="text-xs text-[var(--text-muted)]">/</span>
+                        <span className="text-sm font-semibold text-[var(--text-primary)] truncate">
+                            {currentTitle}
+                        </span>
+                    </div>
+                ) : (
+                    /* Nav tabs when on a root page */
+                    <nav className="flex items-center gap-0.5 flex-1">
+                        {NAV_ITEMS.map((item) => {
+                            const isActive = rootPage === item.name
+                            return (
+                                <button
+                                    key={item.name}
+                                    onClick={() => handleNavClick(item)}
+                                    className={`
+                                        px-3 py-1.5 rounded-md text-sm font-medium
+                                        transition-colors duration-150
+                                        ${isActive
+                                            ? 'bg-accent-500/15 text-accent-500'
+                                            : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'
+                                        }
+                                    `}
+                                >
+                                    {item.name}
+                                </button>
+                            )
+                        })}
+                    </nav>
+                )}
+
+                {/* Right side: quick add + settings */}
+                <div className="flex items-center gap-1 flex-shrink-0">
                     <button
-                        onClick={() => setIsExpanded(!isExpanded)}
-                        className="p-2 rounded-md text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors"
+                        onClick={() => setIsQuickAddOpen(true)}
+                        className="
+                            flex items-center gap-1.5 px-2.5 py-1.5 rounded-md
+                            bg-accent-500 text-white text-sm font-medium
+                            hover:bg-accent-600 active:bg-accent-700
+                            transition-colors duration-150
+                        "
                     >
-                        {isExpanded ? <ChevronLeftIcon /> : <MenuIcon />}
+                        <PlusIcon />
+                        <span>Track</span>
+                    </button>
+                    <button
+                        onClick={handleSettingsClick}
+                        className={`
+                            p-1.5 rounded-md transition-colors
+                            ${rootPage === 'Settings'
+                                ? 'text-accent-500 bg-accent-500/15'
+                                : 'text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]'
+                            }
+                        `}
+                        title="Settings"
+                    >
+                        <SettingsIcon />
                     </button>
                 </div>
+            </header>
 
-                {/* Nav Items */}
-                <nav className="flex-1 flex flex-col justify-between p-2">
-                    <div className="flex flex-col gap-1">
-                        {NAV_ITEMS.map((item) => (
-                            <NavButton key={item.name} item={item} />
-                        ))}
-                    </div>
-                    <div className="flex flex-col gap-1">
-                        {BOTTOM_NAV_ITEMS.map((item) => (
-                            <NavButton key={item.name} item={item} />
-                        ))}
-                    </div>
-                </nav>
-            </aside>
+            {/* Page Content */}
+            <main className="flex-1 overflow-auto bg-[var(--bg-primary)] p-4">
+                {currentView.view}
+            </main>
 
-            {/* Main Content Area */}
-            <div className="flex-1 flex flex-col min-w-0">
-                {/* Header */}
-                <header className="h-12 flex items-center px-4 bg-[var(--bg-secondary)] border-b border-[var(--border-color)]">
-                    {/* Breadcrumbs */}
-                    <nav className="flex items-center gap-1 text-sm">
-                        {viewHistory.map((view, index) => (
-                            <div key={index} className="flex items-center gap-1">
-                                {index > 0 && (
-                                    <ChevronRightIcon />
-                                )}
-                                {index === viewHistory.length - 1 ? (
-                                    <span className="font-semibold text-[var(--text-primary)]">
-                                        {view.title}
-                                    </span>
-                                ) : (
-                                    <button
-                                        onClick={() => handleBreadcrumbClick(index)}
-                                        className="text-[var(--text-muted)] hover:text-[var(--text-primary)] transition-colors"
-                                    >
-                                        {view.title}
-                                    </button>
-                                )}
-                            </div>
-                        ))}
-                    </nav>
-                </header>
-
-                {/* Page Content */}
-                <main className="flex-1 overflow-auto bg-[var(--bg-primary)] p-4">
-                    {currentView.view}
-                </main>
-            </div>
+            {/* Global Quick Add Modal */}
+            <Dialog open={isQuickAddOpen} onOpenChange={(open) => !open && setIsQuickAddOpen(false)}>
+                <DialogContent title="Track Application">
+                    <ApplicationInputEdit onClose={() => setIsQuickAddOpen(false)} />
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

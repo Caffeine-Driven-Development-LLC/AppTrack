@@ -54,12 +54,35 @@ export default function ApplicationInputEdit({ onClose, application }) {
             }))
             setCompanyOptions(companyMap)
         })
+
+        window.companyApi.onGetCompany((event, company) => {
+            const newOption = { id: company.id, label: company.name }
+            setCompanyOptions((prev) => {
+                if (prev.some((c) => c.id === company.id)) return prev
+                return [...prev, newOption]
+            })
+            setApplicationInput((prev) => ({
+                ...prev,
+                companyId: company.id,
+            }))
+        })
+
         window.companyApi.getCompanyNames()
 
         return () => {
             window.companyApi.removeListeners()
         }
     }, [])
+
+    const handleCreateCompany = (companyName) => {
+        window.companyApi.createCompany({
+            name: companyName,
+            homePage: '',
+            careerPage: '',
+            notes: '',
+            isFavorite: false,
+        }, null)
+    }
 
     const handleChange = (event) => {
         let { id, value } = event.target
@@ -120,7 +143,9 @@ export default function ApplicationInputEdit({ onClose, application }) {
                     }}
                     options={companyOptions}
                     getOptionLabel={(opt) => opt?.label || ''}
-                    placeholder="Select a company..."
+                    placeholder="Search or create a company..."
+                    onCreateNew={handleCreateCompany}
+                    createNewLabel={(name) => `+ Create "${name}" as new company`}
                 />
 
                 {!applicationInput.id && initialEvents.length > 1 && (

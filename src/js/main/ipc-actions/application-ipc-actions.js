@@ -1,8 +1,10 @@
 import {
     requestApplications,
     requestApplicationsForCompany,
+    requestAllApplicationsSankeyData,
     requestCreateApplication,
     requestCreateEvent,
+    requestDashboardData,
     requestDeleteApplication,
     requestDeleteEvent,
     requestEventsForApplication,
@@ -13,14 +15,18 @@ import {
     responseApplicationDeleted,
     responseApplications,
     responseApplicationsForCompany,
+    responseAllApplicationsSankeyData,
+    responseDashboardData,
     responseEventsForApplication,
 } from '../../shared/application-ipc-channels.js'
 import {
     addEvent,
     createNewApplication,
+    getAllApplicationsSankeyData,
     getApplicationById,
     getApplications,
     getApplicationsByCompanyId,
+    getDashboardData,
     getEventsForApplication,
     updateApplication,
     updateEvent,
@@ -167,6 +173,28 @@ export default function (ipcMain) {
                 logger.error(
                     `Error getting applications for company: ${error.message}`
                 )
+            })
+    })
+
+    ipcMain.on(requestDashboardData, async (event) => {
+        logger.debug('Requesting dashboard data')
+        getDashboardData()
+            .then((data) => {
+                event.reply(responseDashboardData, data)
+            })
+            .catch((error) => {
+                logger.error(`Error getting dashboard data: ${error.message}`)
+            })
+    })
+
+    ipcMain.on(requestAllApplicationsSankeyData, async (event, startDate, endDate) => {
+        logger.debug('Requesting all applications sankey data')
+        getAllApplicationsSankeyData(startDate, endDate)
+            .then((sankeyData) => {
+                event.reply(responseAllApplicationsSankeyData, sankeyData)
+            })
+            .catch((error) => {
+                logger.error(`Error getting all applications sankey data: ${error.message}`)
             })
     })
 }

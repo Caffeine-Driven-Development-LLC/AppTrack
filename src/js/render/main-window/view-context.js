@@ -1,10 +1,10 @@
 import { createContext, useState } from 'react'
-import ApplicationList from './page/application-list.js'
+import Dashboard from './page/dashboard.js'
 
 const initialViewHistory = [
     {
-        view: <ApplicationList />,
-        title: 'Applications',
+        view: <Dashboard />,
+        title: 'Dashboard',
     },
 ]
 

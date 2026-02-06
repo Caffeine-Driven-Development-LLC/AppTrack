@@ -8,6 +8,7 @@ import {
     selectApplications,
     selectApplicationsByCompanyId,
     selectEventsByApplicationId,
+    selectRecentEvents,
     updateApplication as updateApplicationInDb,
     updateEvent as updateEventInDb,
 } from '../persistence/application-persistence.js'
@@ -130,6 +131,84 @@ export async function searchApplications(searchText) {
     return searchApplicationsInDb(searchText).then((applications) =>
         applications.map(populateGhostData)
     )
+}
+
+/**
+ * Returns sankey data for all applications, optionally filtered by date range.
+ * @param startDate optional start date string (YYYY-MM-DD)
+ * @param endDate optional end date string (YYYY-MM-DD)
+ * @returns {Promise<{nodes: [], links: []}>} sankey data
+ */
+export async function getAllApplicationsSankeyData(startDate, endDate) {
+    const allApplications = await selectApplications(false, null, true)
+        .then((applications) => applications.map(populateGhostData))
+        .then((applications) => Promise.all(applications.map(populateEvents)))
+
+    const filtered = allApplications.filter((app) => {
+        if (!app.events || app.events.length === 0) return false
+        const firstEventDate = app.events[0]?.date
+        if (startDate && firstEventDate < startDate) return false
+        if (endDate && firstEventDate > endDate) return false
+        return true
+    })
+
+    return getSankeyData(filtered)
+}
+
+/**
+ * Returns dashboard data including active applications needing attention,
+ * quick stats, and recent activity.
+ * @returns {Promise<Object>} dashboard data
+ */
+export async function getDashboardData() {
+    const cutoffDate = new Date()
+    cutoffDate.setDate(cutoffDate.getDate() - ghostPeriod())
+    const year = cutoffDate.getFullYear()
+    const month = (cutoffDate.getMonth() + 1).toString().padStart(2, '0')
+    const day = cutoffDate.getDate().toString().padStart(2, '0')
+    const cutoffDateString = `${year}-${month}-${day}`
+
+    const activeApplications = await selectApplications(
+        false,
+        cutoffDateString,
+        false
+    ).then((apps) => apps.map(populateGhostData))
+
+    const allApplications = await selectApplications(false, null, true).then(
+        (apps) => apps.map(populateGhostData)
+    )
+
+    const recentEvents = await selectRecentEvents(20)
+
+    // Compute stats
+    const now = new Date()
+    const weekAgo = new Date(now)
+    weekAgo.setDate(weekAgo.getDate() - 7)
+    const monthAgo = new Date(now)
+    monthAgo.setMonth(monthAgo.getMonth() - 1)
+
+    const weekStr = `${weekAgo.getFullYear()}-${(weekAgo.getMonth() + 1).toString().padStart(2, '0')}-${weekAgo.getDate().toString().padStart(2, '0')}`
+    const monthStr = `${monthAgo.getFullYear()}-${(monthAgo.getMonth() + 1).toString().padStart(2, '0')}-${monthAgo.getDate().toString().padStart(2, '0')}`
+
+    const appliedThisWeek = allApplications.filter(
+        (app) => app.lastUpdated >= weekStr
+    ).length
+    const appliedThisMonth = allApplications.filter(
+        (app) => app.lastUpdated >= monthStr
+    ).length
+
+    const needsAttention = activeApplications
+        .filter((app) => app.percentGhosted >= 50 && app.percentGhosted < 100)
+        .sort((a, b) => b.percentGhosted - a.percentGhosted)
+
+    return {
+        activeCount: activeApplications.length,
+        totalCount: allApplications.length,
+        appliedThisWeek,
+        appliedThisMonth,
+        needsAttention,
+        recentEvents,
+    }
 }
 
 /**

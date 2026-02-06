@@ -112,9 +112,16 @@ export default function CompanyList({ initialSearchText }) {
         <div className="flex flex-col gap-4">
             {/* Header */}
             <div className="flex justify-between items-center">
-                <Button onClick={openCreateCompanyModal}>
-                    Add Company
-                </Button>
+                <div className="flex items-center gap-3">
+                    <Button onClick={openCreateCompanyModal}>
+                        Add Company
+                    </Button>
+                    {!isLoading && displayedCompanies.length > 0 && (
+                        <span className="text-sm text-[var(--text-muted)]">
+                            {displayedCompanies.length} compan{displayedCompanies.length !== 1 ? 'ies' : 'y'}
+                        </span>
+                    )}
+                </div>
                 <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-muted)]">
                         <SearchIcon />
@@ -152,10 +159,21 @@ export default function CompanyList({ initialSearchText }) {
                         <Spinner />
                     </div>
                 ) : displayedCompanies.length === 0 ? (
-                    <div className="text-center py-8 text-[var(--text-muted)]">
-                        {searchText
-                            ? `No companies found for "${searchText}"`
-                            : 'No companies found'}
+                    <div className="text-center py-12 px-6">
+                        {searchText ? (
+                            <p className="text-[var(--text-muted)]">
+                                No companies found for "{searchText}"
+                            </p>
+                        ) : (
+                            <div className="flex flex-col items-center gap-2">
+                                <p className="text-[var(--text-secondary)] font-medium">
+                                    No companies yet
+                                </p>
+                                <p className="text-sm text-[var(--text-muted)]">
+                                    Add companies you're interested in to track your applications
+                                </p>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     displayedCompanies.map((c, index) => (

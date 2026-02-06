@@ -12,6 +12,12 @@ export const responseApplications = 'response-applications'
 export const responseApplicationsForCompany =
     'response-applications-for-company'
 
+export const requestAllApplicationsSankeyData = 'request-all-applications-sankey-data'
+export const responseAllApplicationsSankeyData = 'response-all-applications-sankey-data'
+
+export const requestDashboardData = 'request-dashboard-data'
+export const responseDashboardData = 'response-dashboard-data'
+
 export const requestCreateEvent = 'request-create-event'
 export const requestEventsForApplication = 'request-events-for-application'
 export const responseEventsForApplication = 'response-events-for-application'

@@ -2,8 +2,10 @@ import { contextBridge, ipcRenderer } from 'electron'
 import {
     requestApplications,
     requestApplicationsForCompany,
+    requestAllApplicationsSankeyData,
     requestCreateApplication,
     requestCreateEvent,
+    requestDashboardData,
     requestDeleteApplication,
     requestDeleteEvent,
     requestEventsForApplication,
@@ -14,6 +16,8 @@ import {
     responseApplicationDeleted,
     responseApplications,
     responseApplicationsForCompany,
+    responseAllApplicationsSankeyData,
+    responseDashboardData,
     responseEventsForApplication,
 } from '../../shared/application-ipc-channels.js'
 
@@ -42,6 +46,16 @@ export default function () {
         onGetApplicationsForCompany: (callback) =>
             ipcRenderer.on(responseApplicationsForCompany, callback),
 
+        getAllApplicationsSankeyData: (startDate, endDate) =>
+            ipcRenderer.send(requestAllApplicationsSankeyData, startDate, endDate),
+        onGetAllApplicationsSankeyData: (callback) =>
+            ipcRenderer.on(responseAllApplicationsSankeyData, callback),
+
+        getDashboardData: () =>
+            ipcRenderer.send(requestDashboardData),
+        onGetDashboardData: (callback) =>
+            ipcRenderer.on(responseDashboardData, callback),
+
         getEventsForApplication: (applicationId) =>
             ipcRenderer.send(requestEventsForApplication, applicationId),
         onGetEventsForApplication: (callback) =>
@@ -69,6 +83,8 @@ export default function () {
             ipcRenderer.removeAllListeners(responseApplicationDeleted)
             ipcRenderer.removeAllListeners(responseApplications)
             ipcRenderer.removeAllListeners(responseApplicationsForCompany)
+            ipcRenderer.removeAllListeners(responseAllApplicationsSankeyData)
+            ipcRenderer.removeAllListeners(responseDashboardData)
             ipcRenderer.removeAllListeners(responseEventsForApplication)
         },
     })

@@ -57,89 +57,106 @@ export default function CompanyDetails({ initialCompany }) {
     }, [])
 
     return (
-        <div className="w-full">
-            <div className="flex flex-col gap-4">
-                <CompanyOverview company={company} logoTrigger={logoTrigger} />
+        <div className="w-full max-w-4xl">
+            <div className="flex flex-col gap-5">
+                {/* Company Overview Card */}
+                <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-4">
+                    <CompanyOverview company={company} logoTrigger={logoTrigger} />
 
-                <div className="flex items-center gap-2">
-                    {company.homePage && (
+                    {/* Links & Actions */}
+                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--border-color)]">
+                        {company.homePage && (
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => window.api.openLink(company.homePage)}
+                            >
+                                Home Page
+                            </Button>
+                        )}
+                        {company.careerPage && (
+                            <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => window.api.openLink(company.careerPage)}
+                            >
+                                Career Page
+                            </Button>
+                        )}
                         <Button
-                            variant="secondary"
+                            variant="ghost"
                             size="sm"
-                            onClick={() => window.api.openLink(company.homePage)}
+                            onClick={() => setIsCompanyInputModalOpen(true)}
                         >
-                            Home Page
+                            Edit
                         </Button>
-                    )}
-                    {company.careerPage && (
-                        <Button
-                            variant="secondary"
-                            size="sm"
-                            onClick={() => window.api.openLink(company.careerPage)}
-                        >
-                            Career Page
-                        </Button>
-                    )}
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsCompanyInputModalOpen(true)}
-                    >
-                        Edit
-                    </Button>
+                    </div>
                 </div>
 
                 {company.notes && (
-                    <p className="text-[var(--text-primary)] whitespace-pre-wrap">
-                        {company.notes}
-                    </p>
+                    <div>
+                        <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
+                            Notes
+                        </h3>
+                        <p className="text-sm text-[var(--text-primary)] whitespace-pre-wrap bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-3">
+                            {company.notes}
+                        </p>
+                    </div>
                 )}
 
-                {sankeyData && <SanKeyGraph data={sankeyData} />}
+                {sankeyData && (
+                    <div>
+                        <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
+                            Application Flow
+                        </h3>
+                        <div className="bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg p-3">
+                            <SanKeyGraph data={sankeyData} />
+                        </div>
+                    </div>
+                )}
 
-                <h2 className="text-xl font-semibold text-[var(--text-primary)]">Applications</h2>
-
-                <div className="border border-[var(--border-color)] rounded overflow-hidden">
-                    <Table>
-                        <TableHead>
-                            <TableRow hover={false}>
-                                <TableCell header>Role</TableCell>
-                                <TableCell header>Applied Date</TableCell>
-                                <TableCell header>Salary - High</TableCell>
-                                <TableCell header>Salary - Low</TableCell>
-                            </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {applications.map((application) => (
-                                <TableRow
-                                    key={application.id}
-                                    onClick={(event) => handleOnClickApplicaion(event, application)}
-                                >
-                                    <TableCell>{application.role}</TableCell>
-                                    <TableCell>
-                                        {parseDateToLocalString(application.events[0]?.date)}
-                                    </TableCell>
-                                    <TableCell>
-                                        {application.salaryRangeHigh
-                                            ? `$${Intl.NumberFormat().format(application.salaryRangeHigh)}`
-                                            : '-'}
-                                    </TableCell>
-                                    <TableCell>
-                                        {application.salaryRangeLow
-                                            ? `$${Intl.NumberFormat().format(application.salaryRangeLow)}`
-                                            : '-'}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                            {applications.length === 0 && (
+                <div>
+                    <h3 className="text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wide mb-2">
+                        Applications ({applications.length})
+                    </h3>
+                    <div className="border border-[var(--border-color)] rounded-lg overflow-hidden">
+                        <Table>
+                            <TableHead>
                                 <TableRow hover={false}>
-                                    <TableCell className="text-center text-[var(--text-muted)]" colSpan={4}>
-                                        No applications
-                                    </TableCell>
+                                    <TableCell header>Role</TableCell>
+                                    <TableCell header>Applied Date</TableCell>
+                                    <TableCell header>Salary Range</TableCell>
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                            </TableHead>
+                            <TableBody>
+                                {applications.map((application) => (
+                                    <TableRow
+                                        key={application.id}
+                                        onClick={(event) => handleOnClickApplicaion(event, application)}
+                                    >
+                                        <TableCell>
+                                            <span className="font-medium">{application.role}</span>
+                                        </TableCell>
+                                        <TableCell>
+                                            {parseDateToLocalString(application.events[0]?.date)}
+                                        </TableCell>
+                                        <TableCell>
+                                            {application.salaryRangeLow && application.salaryRangeHigh
+                                                ? `$${Intl.NumberFormat().format(application.salaryRangeLow)} - $${Intl.NumberFormat().format(application.salaryRangeHigh)}`
+                                                : '-'}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                                {applications.length === 0 && (
+                                    <TableRow hover={false}>
+                                        <TableCell className="text-center text-[var(--text-muted)]" colSpan={3}>
+                                            No applications sent to this company yet
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </div>
                 </div>
             </div>
 

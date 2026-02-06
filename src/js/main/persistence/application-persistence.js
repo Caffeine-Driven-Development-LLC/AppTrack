@@ -282,6 +282,28 @@ AND (
     )
 ORDER BY applicationState.displayOrder DESC, recent_event.date DESC`
 
+export async function selectRecentEvents(limit = 15) {
+    return getDatabaseConnection().all(selectRecentEventsSql, [limit])
+}
+
+const selectRecentEventsSql = `SELECT
+e.id,
+e.date,
+e.notes,
+s.name as status,
+s.id as statusId,
+a.id as applicationId,
+a.role as role,
+c.name as companyName,
+c.logoPath as companyLogoPath
+FROM events e
+JOIN applications a ON e.applicationId = a.id
+JOIN companies c ON a.companyId = c.id
+LEFT JOIN applicationStates s ON e.applicationStateId = s.id
+WHERE a.isDeleted = 0
+ORDER BY e.id DESC
+LIMIT ?`
+
 const deleteAllEventsSql = `DELETE FROM events;`
 
 const deleteAllApplicationsSql = `DELETE FROM applications;`

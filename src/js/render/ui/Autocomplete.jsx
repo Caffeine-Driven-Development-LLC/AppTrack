@@ -13,6 +13,8 @@ export function Autocomplete({
   getOptionLabel = (opt) => opt?.label || opt || '',
   placeholder = 'Search...',
   freeSolo = false,
+  onCreateNew,
+  createNewLabel = (text) => `Create "${text}"`,
   className = '',
 }) {
   const [isOpen, setIsOpen] = useState(false)
@@ -63,6 +65,13 @@ export function Autocomplete({
     setIsOpen(false)
   }
 
+  const handleCreateNew = () => {
+    if (onCreateNew && inputValue.trim()) {
+      onCreateNew(inputValue.trim())
+      setIsOpen(false)
+    }
+  }
+
   const handleKeyDown = (e) => {
     if (e.key === 'Escape') {
       setIsOpen(false)
@@ -71,6 +80,11 @@ export function Autocomplete({
       setIsOpen(false)
     }
   }
+
+  const hasExactMatch = filteredOptions.some(
+    (opt) => getOptionLabel(opt).toLowerCase() === inputValue.toLowerCase()
+  )
+  const showCreateOption = onCreateNew && inputValue.trim() && !hasExactMatch
 
   return (
     <div ref={containerRef} className={`relative ${className}`}>
@@ -98,7 +112,7 @@ export function Autocomplete({
           transition-colors duration-150
         "
       />
-      {isOpen && filteredOptions.length > 0 && (
+      {isOpen && (filteredOptions.length > 0 || showCreateOption) && (
         <div className="
           absolute z-50 w-full mt-1 py-1
           bg-[var(--bg-secondary)] border border-[var(--border-color)]
@@ -122,6 +136,20 @@ export function Autocomplete({
               {getOptionLabel(option)}
             </button>
           ))}
+          {showCreateOption && (
+            <>
+              {filteredOptions.length > 0 && (
+                <div className="border-t border-[var(--border-color)] my-1" />
+              )}
+              <button
+                type="button"
+                onClick={handleCreateNew}
+                className="w-full px-3 py-2 text-left text-sm text-accent-500 hover:bg-[var(--bg-tertiary)] transition-colors duration-100"
+              >
+                {createNewLabel(inputValue.trim())}
+              </button>
+            </>
+          )}
         </div>
       )}
     </div>
